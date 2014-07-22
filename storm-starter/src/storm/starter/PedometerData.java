@@ -3,12 +3,18 @@ package storm.starter;
 public class PedometerData {
 	private String deviceId;
 	private String companyId;
+	private String date;
+	private String time;
 	private double calorie;
 	private double distance;
 	private double runStep;
-	private double speed;
 	private double totalStep;
 	private double walkStep;
+	private double deltaCalorie;
+	private double deltaDistance;
+	private double deltaRunStep;
+	private double deltaTotalStep;
+	private double deltaWalkStep;
 
 	public String getDeviceId() {
 		return deviceId;
@@ -24,6 +30,22 @@ public class PedometerData {
 
 	public void setCompanyId(String companyId) {
 		this.companyId = companyId;
+	}
+	
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 	public double getCalorie() {
@@ -50,14 +72,6 @@ public class PedometerData {
 		this.runStep = runStep;
 	}
 
-	public double getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-
 	public double getTotalStep() {
 		return totalStep;
 	}
@@ -73,4 +87,45 @@ public class PedometerData {
 	public void setWalkStep(double walkStep) {
 		this.walkStep = walkStep;
 	}
+	
+	public double getDeltaCalorie() {
+		return deltaCalorie;
+	}
+
+	public void setDeltaCalorie(double deltaCalorie) {
+		this.deltaCalorie = deltaCalorie;
+	}
+	
+	public double getDeltaDistance() {
+		return deltaDistance;
+	}
+
+	public void setDeltaDistance(double deltaDistance) {
+		this.deltaDistance = deltaDistance;
+	}
+	
+	public double getDeltaRunStep() {
+		return deltaRunStep;
+	}
+
+	public void setDeltaRunStep(double deltaRunStep) {
+		this.deltaRunStep = deltaRunStep;
+	}
+	
+	public double getDeltaTotalStep() {
+		return deltaTotalStep;
+	}
+
+	public void setDeltaTotalStep(double deltaTotalStep) {
+		this.deltaTotalStep = deltaTotalStep;
+	}
+
+	public double getDeltaWalkStep() {
+		return deltaWalkStep;
+	}
+
+	public void setDeltaWalkStep(double deltaWalkStep) {
+		this.deltaWalkStep = deltaWalkStep;
+	}
+
 }

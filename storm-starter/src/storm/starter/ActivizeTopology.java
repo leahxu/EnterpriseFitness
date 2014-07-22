@@ -36,20 +36,23 @@ public class ActivizeTopology {
 
 	// writes to file deviceId.out
 	public static class DisplayBoltDevice extends BaseBasicBolt {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void execute(Tuple tuple, BasicOutputCollector collector) {
 			String deviceId = tuple.getString(0);
 			String companyId = tuple.getString(1);
-			double calorie = tuple.getDouble(2);
-			double distance = tuple.getDouble(3);
-			double runStep = tuple.getDouble(4);
-			double speed = tuple.getDouble(5);
-			double totalStep = tuple.getDouble(6);
-			double walkStep = tuple.getDouble(7);
+			String date = tuple.getString(2);
+			String time = tuple.getString(3);
+			double calorie = tuple.getDouble(4);
+			double distance = tuple.getDouble(5);
+			double runStep = tuple.getDouble(6);
+			double totalStep = tuple.getDouble(7);
+			double walkStep = tuple.getDouble(8);
 
 			try {
-				bw.write(deviceId + "|" + companyId + "|" + calorie + "|"
-						+ distance + "|" + runStep + "|" + speed + "|"
+				bw.write(deviceId + "|" + companyId + "|" + date + "|" + time
+						+ "|" + calorie + "|" + distance + "|" + runStep + "|"
 						+ totalStep + "|" + walkStep + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -66,20 +69,23 @@ public class ActivizeTopology {
 
 	// writes to file company.out
 	public static class DisplayBoltCompany extends BaseBasicBolt {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void execute(Tuple tuple, BasicOutputCollector collector) {
 			String deviceId = tuple.getString(0);
 			String companyId = tuple.getString(1);
-			double calorie = tuple.getDouble(2);
-			double distance = tuple.getDouble(3);
-			double runStep = tuple.getDouble(4);
-			double speed = tuple.getDouble(5);
-			double totalStep = tuple.getDouble(6);
-			double walkStep = tuple.getDouble(7);
+			String date = tuple.getString(2);
+			String time = tuple.getString(3);
+			double calorie = tuple.getDouble(4);
+			double distance = tuple.getDouble(5);
+			double runStep = tuple.getDouble(6);
+			double totalStep = tuple.getDouble(7);
+			double walkStep = tuple.getDouble(8);
 
 			try {
-				bw2.write(deviceId + "|" + companyId + "|" + calorie + "|"
-						+ distance + "|" + runStep + "|" + speed + "|"
+				bw2.write(deviceId + "|" + companyId + "|" + date + "|" + time
+						+ "|" + calorie + "|" + distance + "|" + runStep + "|"
 						+ totalStep + "|" + walkStep + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -99,7 +105,7 @@ public class ActivizeTopology {
 		// Creating a file to write the data to
 		// Temporary and for testing purposes
 		try {
-			file = new File("/home/leah/workspace/storm-starter/deviceId.out");
+			file = new File("/home/leah/git/EnterpriseFitness/storm-starter/user.out");
 
 			if (!file.exists()) {
 				file.createNewFile();
@@ -113,7 +119,7 @@ public class ActivizeTopology {
 		}
 
 		try {
-			file2 = new File("/home/leah/workspace/storm-starter/company.out");
+			file2 = new File("/home/leah/git/EnterpriseFitness/storm-starter/company.out");
 
 			if (!file2.exists()) {
 				file2.createNewFile();
@@ -160,7 +166,7 @@ public class ActivizeTopology {
 		// conf.setMaxTaskParallelism(3);
 
 		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("sbMessageReceiver", conf,
+		cluster.submitTopology("ActivizeTopology", conf,
 				builder.createTopology());
 
 		// Waits for key press to stop program
