@@ -1,13 +1,13 @@
 package storm.starter.spout;
 
 import storm.starter.spout.interfaces.IServiceBusQueueDetail;
-
 import backtype.storm.spout.*;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import backtype.storm.utils.Utils;
 
 import org.apache.log4j.Logger;
 
@@ -56,7 +56,14 @@ public class ServiceBusQueueSpout extends BaseRichSpout {
             logger.info("attempting to get next message from queue " + this.detail.getQueueName());
             if(!this.detail.isConnected())
                 return;
-
+            
+            Utils.sleep(5000);
+            try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+            
             // this message can be anything - most likely JSON but we don't impose a structure in the spout
             String message = this.detail.getNextMessageForSpout();
             logger.info("Received message is null: " + (message == null));
@@ -73,7 +80,11 @@ public class ServiceBusQueueSpout extends BaseRichSpout {
             // TODO: look at adding a retry-fail strategy if this continually dies then it maybe that we're connected but something
             logger.error(sbse.getMessage());
             // has happened to the SB namespace
-            try { Thread.sleep(500); } catch(InterruptedException ie) {};
+            try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         }
     }
     @Override

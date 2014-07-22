@@ -31,7 +31,7 @@ public class PedometerData {
 	public void setCompanyId(String companyId) {
 		this.companyId = companyId;
 	}
-	
+
 	public String getDate() {
 		return date;
 	}
@@ -87,7 +87,7 @@ public class PedometerData {
 	public void setWalkStep(double walkStep) {
 		this.walkStep = walkStep;
 	}
-	
+
 	public double getDeltaCalorie() {
 		return deltaCalorie;
 	}
@@ -95,7 +95,7 @@ public class PedometerData {
 	public void setDeltaCalorie(double deltaCalorie) {
 		this.deltaCalorie = deltaCalorie;
 	}
-	
+
 	public double getDeltaDistance() {
 		return deltaDistance;
 	}
@@ -103,7 +103,7 @@ public class PedometerData {
 	public void setDeltaDistance(double deltaDistance) {
 		this.deltaDistance = deltaDistance;
 	}
-	
+
 	public double getDeltaRunStep() {
 		return deltaRunStep;
 	}
@@ -111,7 +111,7 @@ public class PedometerData {
 	public void setDeltaRunStep(double deltaRunStep) {
 		this.deltaRunStep = deltaRunStep;
 	}
-	
+
 	public double getDeltaTotalStep() {
 		return deltaTotalStep;
 	}
