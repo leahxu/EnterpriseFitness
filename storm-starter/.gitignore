@@ -1,4 +1,5 @@
 *.class
+*.properties
 
 # Output files
 *.out
