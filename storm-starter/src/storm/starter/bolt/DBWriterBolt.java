@@ -20,6 +20,7 @@ public class DBWriterBolt extends BaseBasicBolt {
 
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
+		String table = tuple.getString(0);
 		String deviceId = tuple.getString(0);
 		String companyId = tuple.getString(1);
 		String date = tuple.getString(2);
@@ -29,25 +30,27 @@ public class DBWriterBolt extends BaseBasicBolt {
 		double runStep = tuple.getDouble(6);
 		double totalStep = tuple.getDouble(7);
 		double walkStep = tuple.getDouble(8);
+		double deltaCalorie = tuple.getDouble(9);
+		double deltaDistance = tuple.getDouble(10);
+		double deltaRunStep = tuple.getDouble(11);
+		double deltaTotalStep = tuple.getDouble(12);
+		double deltaWalkStep = tuple.getDouble(13);
 
-		String[] sqlQuery = new String[5];
-		String[] metricName = { "Calorie", "Distance", "RunStep", "TotalStep",
-				"WalkStep" };
-		double[] metric = { calorie, distance, runStep, totalStep, walkStep };
-
-		for (int i = 0; i < 5; i++) {
-			sqlQuery[i] = "INSERT INTO "
-					+ "[ActivizeDB].[dbo].[Monthly]([Metric],[Avg Values],[Timestamp],[Company]) "
-					+ "VALUES ('"
-					+ metricName[i]
-					+ "',"
-					+ metric[i]
-					+ ",'"
-					+ date + " " + time + "','" + companyId + "')";
-			loadPropertiesDB(sqlQuery[i]);
-		}		
-
-		collector.emit(new Values("DBWriter"));
+		if (table.equals("Raw")) {
+			writeRawQuery(table, deviceId, companyId, date, time, calorie, 
+					distance, runStep, totalStep, walkStep, deltaCalorie, deltaDistance,
+					deltaRunStep, deltaTotalStep, deltaWalkStep);
+		} else if (table.equals("DailyCompany")) {
+			
+		} else if (table.equals("DailyUser")) {
+			
+		} else if (table.equals("RTCompany")) {
+			
+		} else if (table.equals("RTUser")) {
+			
+		} else {
+			System.out.println("ERROR: This is not a valid table name!");
+		}
 	}
 
 	@Override
@@ -110,24 +113,58 @@ public class DBWriterBolt extends BaseBasicBolt {
 
 		connectDB(connectionString, sqlString);
 	}
-	
-	public static void writeToRawDB() {
-		
+
+	public static void writeRawQuery(String table, String deviceId, String companyId,
+			String date, String time, double calorie, double distance,
+			double runStep, double totalStep, double walkStep,
+			double deltaCalorie, double deltaDistance, double deltaRunStep,
+			double deltaTotalStep, double deltaWalkStep) {
+		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
+				+ "([deviceId],[companyId],[timestamp],[calorie],[distance],"
+				+ "[runStep],[totalStep],[walkStep],[deltaCalorie],"
+				+ "[deltaDistance],[deltaRunStep],[deltaTotalStep],"
+				+ "[deltaWalkStep]) VALUES ('"
+				+ deviceId + "','"
+				+ companyId + "','"
+				+ date + " "
+				+ time + "',"
+				+ calorie + ","
+				+ distance + ","
+				+ runStep + ","
+				+ totalStep + ","
+				+ walkStep + ","
+				+ deltaCalorie + ","
+				+ deltaDistance + ","
+				+ deltaRunStep + ","
+				+ deltaTotalStep + "," + deltaWalkStep + ")";
+
+		loadPropertiesDB(sqlQuery);
+
 	}
-	
-	public static void writeToRTUser() {
-		
+
+	public static void writeUserQuery(String table, String deviceId,
+			String date, String time, String metricName, double metricValue) {
+		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
+				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
+				+ deviceId + "','" 
+				+ date + " " 
+				+ time + "','" 
+				+ metricName + "'," 
+				+ metricValue + ")";
+
+		loadPropertiesDB(sqlQuery);
 	}
-	
-	public static void writeToRTCompany() {
-		
-	}
-	
-	public static void writeToDailyUser() {
-		
-	}
-	
-	public static void writeToDailyCompany() {
-		
+
+	public static void writeCompanyQuery(String table, String companyId,
+			String date, String time, String metricName, double metricValue) {
+		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
+				+ "([comanpyId],[timestamp],[metric],[value]) VALUES ('"
+				+ companyId + "','" 
+				+ date + " " 
+				+ time + "','" 
+				+ metricName + "'," 
+				+ metricValue + ")";
+
+		loadPropertiesDB(sqlQuery);
 	}
 }
