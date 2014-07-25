@@ -48,7 +48,7 @@
 			<version>0.4.5</version>
 		</dependency>
 
-		<!--  SQLServer JDBC driver -->
+		<!-- SQLServer JDBC driver -->
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>sqljdbc4</artifactId>
@@ -117,11 +117,47 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.8.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
+			<version>3.2.1_1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.mina</artifactId>
+			<version>1.1.7_6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.qpid</artifactId>
+			<version>0.28_1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.xstream</artifactId>
+			<version>1.4.7_1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -174,15 +210,8 @@
 						<sourceDirectory>src/clj</sourceDirectory>
 					</sourceDirectories>
 				</configuration>
-				<!--<executions>
-					<execution>
-						<id>compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>-->
+				<!--<executions> <execution> <id>compile</id> <phase>compile</phase> 
+					<goals> <goal>compile</goal> </goals> </execution> </executions> -->
 			</plugin>
 
 			<plugin>

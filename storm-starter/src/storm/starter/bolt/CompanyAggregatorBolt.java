@@ -31,7 +31,7 @@ public class CompanyAggregatorBolt extends BaseBasicBolt {
 		double deltaWalkStep = tuple.getDouble(13);
 
 		// temporarily turns the String into a double
-		String[] splitDate = date.split("-");
+		String[] splitDate = date.split("/");
 		String stringDate = splitDate[0] + splitDate[1] + splitDate[2];
 		double doubleDate = Double.parseDouble(stringDate);
 

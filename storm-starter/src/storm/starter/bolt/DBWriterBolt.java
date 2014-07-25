@@ -20,15 +20,34 @@ public class DBWriterBolt extends BaseBasicBolt {
 
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
+		String deviceId = tuple.getString(0);
+		String companyId = tuple.getString(1);
+		String date = tuple.getString(2);
+		String time = tuple.getString(3);
+		double calorie = tuple.getDouble(4);
+		double distance = tuple.getDouble(5);
+		double runStep = tuple.getDouble(6);
+		double totalStep = tuple.getDouble(7);
+		double walkStep = tuple.getDouble(8);
 
-		// Define the SQL string.
-		String sqlString = "INSERT INTO "
-				+ "[ActivizeDB].[dbo].[Monthly]([Metric],[Avg Values],[Timestamp],[Company]) "
-				+ "VALUES ('string',1234,'7/23/2014 11:04:00','Microsoft')";
+		String[] sqlQuery = new String[5];
+		String[] metricName = { "Calorie", "Distance", "RunStep", "TotalStep",
+				"WalkStep" };
+		double[] metric = { calorie, distance, runStep, totalStep, walkStep };
 
-		loadPropertiesDB(sqlString);
+		for (int i = 0; i < 5; i++) {
+			sqlQuery[i] = "INSERT INTO "
+					+ "[ActivizeDB].[dbo].[Monthly]([Metric],[Avg Values],[Timestamp],[Company]) "
+					+ "VALUES ('"
+					+ metricName[i]
+					+ "',"
+					+ metric[i]
+					+ ",'"
+					+ date + " " + time + "','" + companyId + "')";
+			loadPropertiesDB(sqlQuery[i]);
+		}		
 
-		collector.emit(new Values("DB"));
+		collector.emit(new Values("DBWriter"));
 	}
 
 	@Override
@@ -86,9 +105,29 @@ public class DBWriterBolt extends BaseBasicBolt {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		String connectionString = prop.getProperty("SQL_CONNECTION");
-		
+
 		connectDB(connectionString, sqlString);
+	}
+	
+	public static void writeToRawDB() {
+		
+	}
+	
+	public static void writeToRTUser() {
+		
+	}
+	
+	public static void writeToRTCompany() {
+		
+	}
+	
+	public static void writeToDailyUser() {
+		
+	}
+	
+	public static void writeToDailyCompany() {
+		
 	}
 }

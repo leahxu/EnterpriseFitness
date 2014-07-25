@@ -50,10 +50,10 @@ public class ActivizeTopology {
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
 		builder.setBolt("UserDisplayBolt", new FileWriterBolt(), 3)
 				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("UserDBWriterBolt", new DBWriterBolt(), 1)
-				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("CompanyDBWriterBolt", new DBWriterBolt(), 1)
-				.shuffleGrouping("CompanyAggregateBolt");
+//		builder.setBolt("UserDBWriterBolt", new DBWriterBolt(), 1)
+//				.shuffleGrouping("UserAggregatorBolt");
+//		builder.setBolt("CompanyDBWriterBolt", new DBWriterBolt(), 1)
+//				.shuffleGrouping("CompanyAggregateBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);
