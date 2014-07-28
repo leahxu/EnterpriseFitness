@@ -40,14 +40,14 @@ public class UserAggregatorBolt extends BaseBasicBolt {
 		userData.get(deviceId).put("totalStep", totalStep);
 		userData.get(deviceId).put("walkStep", walkStep);
 
-		collector.emit(new Values(deviceId, companyId, date, time, calorie,
+		collector.emit(new Values("RTUser", deviceId, companyId, date, time, calorie,
 				distance, runStep, totalStep, walkStep, deltaCalorie,
 				deltaDistance, deltaRunStep, deltaTotalStep, deltaWalkStep));
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("deviceId", "companyId", "date", "time",
+		declarer.declare(new Fields("table", "deviceId", "companyId", "date", "time",
 				"calorie", "distance", "runStep", "totalStep", "walkStep",
 				"deltaCalorie", "deltaDistance", "deltaRunStep",
 				"deltaTotalStep", "deltaWalkStep"));

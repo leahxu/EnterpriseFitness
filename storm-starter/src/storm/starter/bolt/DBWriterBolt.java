@@ -36,18 +36,21 @@ public class DBWriterBolt extends BaseBasicBolt {
 		double deltaTotalStep = tuple.getDouble(12);
 		double deltaWalkStep = tuple.getDouble(13);
 
+		String[] metricName[5] = {"calorie", "distance", "runStep", "totalStep", "walkStep"};
+		double[] metricValue[5] = {calorie, distance, runStep, totalStep, walkStep}; 
+
 		if (table.equals("Raw")) {
 			writeRawQuery(table, deviceId, companyId, date, time, calorie, 
 					distance, runStep, totalStep, walkStep, deltaCalorie, deltaDistance,
 					deltaRunStep, deltaTotalStep, deltaWalkStep);
-		} else if (table.equals("DailyCompany")) {
-			
-		} else if (table.equals("DailyUser")) {
-			
-		} else if (table.equals("RTCompany")) {
-			
-		} else if (table.equals("RTUser")) {
-			
+		} else if (table.equals("DailyCompany") || table.equals("RTCompany")) {
+			for (int i = 0; i < metricName.length; i++) {
+				writeCompanyQuery(table, companyId, date, time, metricName[i], metricValue[i]);
+			}
+		} else if (table.equals("DailyUser") || table.equals("RTUser")) {
+			for (int i = 0; i < metricName.length; i++) {
+				writeUserQuery(table, deviceId, date, time, metricName[i], metricValue[i]);
+			}
 		} else {
 			System.out.println("ERROR: This is not a valid table name!");
 		}

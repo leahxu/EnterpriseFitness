@@ -73,14 +73,14 @@ public class CompanyAggregatorBolt extends BaseBasicBolt {
 							+ deltaWalkStep);
 		}
 
-		collector.emit(new Values(deviceId, companyId, date, time, calorie,
+		collector.emit(new Values("RTCompany", deviceId, companyId, date, time, calorie,
 				distance, runStep, totalStep, walkStep, deltaCalorie,
 				deltaDistance, deltaRunStep, deltaTotalStep, deltaWalkStep));
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("deviceId", "companyId", "date", "time",
+		declarer.declare(new Fields("table", "deviceId", "companyId", "date", "time",
 				"calorie", "distance", "runStep", "totalStep", "walkStep",
 				"deltaCalorie", "deltaDistance", "deltaRunStep",
 				"deltaTotalStep", "deltaWalkStep"));
