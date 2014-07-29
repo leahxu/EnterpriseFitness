@@ -63,12 +63,23 @@ public class DBWriterBolt extends BaseBasicBolt {
 		declarer.declare(new Fields("DBWriter"));
 	}
 
-	public static void connectDB(String connectionString, String sqlString) {
+	public static void connectDB (String sqlString) {
+		
+		Properties prop = new Properties();
+		try {
+			prop.load(DBWriterBolt.class.getClassLoader().getResourceAsStream(
+					"config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String connectionString = prop.getProperty("SQL_CONNECTION");
 
 		Connection connection = null; // For making the connection
 		Statement statement = null; // For the SQL statement
 		ResultSet resultSet = null; // For the result set
 
+		
 		try {
 			// Ensure the SQL Server driver class is available.
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -81,6 +92,7 @@ public class DBWriterBolt extends BaseBasicBolt {
 
 			// Execute the statement.
 			statement.executeUpdate(sqlString);
+			
 
 		}
 		// Exception handling
@@ -96,27 +108,15 @@ public class DBWriterBolt extends BaseBasicBolt {
 					connection.close();
 				if (null != statement)
 					statement.close();
-				if (null != resultSet)
+				if (null != resultSet) {
 					resultSet.close();
+				}
+				
 			} catch (SQLException sqlException) {
 				// No additional action if close() statements fail.
 			}
 		}
 
-	}
-
-	public static void loadPropertiesDB(String sqlString) {
-		Properties prop = new Properties();
-		try {
-			prop.load(DBWriterBolt.class.getClassLoader().getResourceAsStream(
-					"config.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		String connectionString = prop.getProperty("SQL_CONNECTION");
-
-		connectDB(connectionString, sqlString);
 	}
 
 	public static void writeRawQuery(String table, String deviceId, String companyId,
@@ -143,13 +143,44 @@ public class DBWriterBolt extends BaseBasicBolt {
 				+ deltaRunStep + ","
 				+ deltaTotalStep + "," + deltaWalkStep + ")";
 
-		loadPropertiesDB(sqlQuery);
+		connectDB(sqlQuery);
 
 	}
 
+	/*public static void writeUserQuery(String table, String deviceId,
+			String date, String time, String metricName, double metricValue) {
+		String insert = "INSERT INTO [dbo].[" + table + "]"
+				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
+				+ deviceId + "','" 
+				+ date + " " 
+				+ time + "','" 
+				+ metricName + "'," 
+				+ metricValue + ")";
+		
+		String update = "UPDATE [dbo].[" + table + "] SET"
+				+ "timestamp = '" + date + " "  + time 
+				+ "', metric = '" + metricName 
+				+ "', value = " + metricValue + "WHERE deviceId = '" + deviceId + "'";
+		
+		String exist = "SELECT * FROM [dbo].[" + table + "] WHERE deviceId = '" + deviceId + "'"; 
+		
+		// Update and ResultSet do not work 
+		ResultSet result = connectDB(exist);
+		
+		String sqlQuery = ""; 
+		
+		if (result != null ){
+			sqlQuery = update; 
+		} else {
+			sqlQuery = insert; 
+		}
+
+		connectDB(update);
+	}*/
+	
 	public static void writeUserQuery(String table, String deviceId,
 			String date, String time, String metricName, double metricValue) {
-		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
+		String insert = "INSERT INTO [dbo].[" + table + "]"
 				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
 				+ deviceId + "','" 
 				+ date + " " 
@@ -157,7 +188,7 @@ public class DBWriterBolt extends BaseBasicBolt {
 				+ metricName + "'," 
 				+ metricValue + ")";
 
-		loadPropertiesDB(sqlQuery);
+		connectDB(insert);
 	}
 
 	public static void writeCompanyQuery(String table, String companyId,
@@ -170,6 +201,6 @@ public class DBWriterBolt extends BaseBasicBolt {
 				+ metricName + "'," 
 				+ metricValue + ")";
 
-		loadPropertiesDB(sqlQuery);
+		connectDB(sqlQuery);
 	}
 }

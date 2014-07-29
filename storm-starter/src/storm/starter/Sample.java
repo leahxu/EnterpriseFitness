@@ -32,17 +32,20 @@ public class Sample implements MessageListener {
 		env.put(Context.INITIAL_CONTEXT_FACTORY,
 				"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory");
 		env.put(Context.PROVIDER_URL,
-				"/home/leah/git/EnterpriseFitness/storm-starter/config.properties");
+				"config.properties");
 		Context context = new InitialContext(env);
+		
 		// Lookup ConnectionFactory and Queue
-		ConnectionFactory cf = (ConnectionFactory) context.lookup("sb_string");
-		Destination queue = (Destination) context.lookup("queue");
+		ConnectionFactory cf = (ConnectionFactory) context.lookup("SBCF");
+		Destination queue = (Destination) context.lookup("QUEUE");
+		
 		// Create Connection
 		connection = cf.createConnection();
 
 		// Create sender-side Session and MessageProducer
 		sendSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		sender = sendSession.createProducer(queue);
+		
 		if (runReceiver) {
 			// Create receiver-side Session, MessageConsumer,and MessageListener
 			receiveSession = connection.createSession(false,
@@ -63,6 +66,7 @@ public class Sample implements MessageListener {
 					.println("Press [enter] to send a message. Type 'exit' + [enter] to quit.");
 			BufferedReader commandLine = new java.io.BufferedReader(
 					new InputStreamReader(System.in));
+			
 			while (true) {
 				String s = commandLine.readLine();
 				if (s.equalsIgnoreCase("exit")) {

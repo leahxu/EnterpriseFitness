@@ -57,7 +57,7 @@ public class ServiceBusQueueSpout extends BaseRichSpout {
             if(!this.detail.isConnected())
                 return;
             
-            Utils.sleep(500);
+            //Utils.sleep(500);
             
             // this message can be anything - most likely JSON but we don't impose a structure in the spout
             String message = this.detail.getNextMessageForSpout();
