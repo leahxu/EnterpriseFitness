@@ -1,15 +1,22 @@
 package storm.starter;
 
-import javax.jms.*;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
 import java.util.Random;
 
-import javax.naming.*;
-
-import org.apache.qpid.jndi.PropertiesFileInitialContextFactory;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
 public class Sample implements MessageListener {
 	private static boolean runReceiver = true;
@@ -21,19 +28,12 @@ public class Sample implements MessageListener {
 	private static Random randomGenerator = new Random();
 
 	public Sample() throws Exception {
-		// PropertiesFileInitialContextFactory contextFactory = new PropertiesFileInitialContextFactory(); 
 		Hashtable<String, String> env = new Hashtable<String, String>();
-		env.put(Context.PROVIDER_URL,
-				"C://home/leah/git/EnterpriseFitness/storm-starter/config.properties");
-		 env.put(Context.INITIAL_CONTEXT_FACTORY,
+		env.put(Context.INITIAL_CONTEXT_FACTORY,
 				"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory");
-		
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.qpid.jndi.PropertiesFileInitialContextFactor");
-		
-		  Context context = new InitialContext(env);
-		//Context context = contextFactory.getInitialContext(env);
-		// ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("qpidConnectionfactory");
-		
+		env.put(Context.PROVIDER_URL,
+				"/home/leah/git/EnterpriseFitness/storm-starter/config.properties");
+		Context context = new InitialContext(env);
 		// Lookup ConnectionFactory and Queue
 		ConnectionFactory cf = (ConnectionFactory) context.lookup("sb_string");
 		Destination queue = (Destination) context.lookup("queue");

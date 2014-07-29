@@ -57,12 +57,7 @@ public class ServiceBusQueueSpout extends BaseRichSpout {
             if(!this.detail.isConnected())
                 return;
             
-            Utils.sleep(5000);
-            try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+            Utils.sleep(500);
             
             // this message can be anything - most likely JSON but we don't impose a structure in the spout
             String message = this.detail.getNextMessageForSpout();
@@ -81,7 +76,7 @@ public class ServiceBusQueueSpout extends BaseRichSpout {
             logger.error(sbse.getMessage());
             // has happened to the SB namespace
             try {
-				Thread.sleep(5000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

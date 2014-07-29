@@ -21,39 +21,41 @@ public class DBWriterBolt extends BaseBasicBolt {
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
 		String table = tuple.getString(0);
-		String deviceId = tuple.getString(0);
-		String companyId = tuple.getString(1);
-		String date = tuple.getString(2);
-		String time = tuple.getString(3);
-		double calorie = tuple.getDouble(4);
-		double distance = tuple.getDouble(5);
-		double runStep = tuple.getDouble(6);
-		double totalStep = tuple.getDouble(7);
-		double walkStep = tuple.getDouble(8);
-		double deltaCalorie = tuple.getDouble(9);
-		double deltaDistance = tuple.getDouble(10);
-		double deltaRunStep = tuple.getDouble(11);
-		double deltaTotalStep = tuple.getDouble(12);
-		double deltaWalkStep = tuple.getDouble(13);
+		String deviceId = tuple.getString(1);
+		String companyId = tuple.getString(2);
+		String date = tuple.getString(3);
+		String time = tuple.getString(4);
+		double calorie = tuple.getDouble(5);
+		double distance = tuple.getDouble(6);
+		double runStep = tuple.getDouble(7);
+		double totalStep = tuple.getDouble(8);
+		double walkStep = tuple.getDouble(9);
+		double deltaCalorie = tuple.getDouble(10);
+		double deltaDistance = tuple.getDouble(11);
+		double deltaRunStep = tuple.getDouble(12);
+		double deltaTotalStep = tuple.getDouble(13);
+		double deltaWalkStep = tuple.getDouble(14);
 
-		String[] metricName[5] = {"calorie", "distance", "runStep", "totalStep", "walkStep"};
-		double[] metricValue[5] = {calorie, distance, runStep, totalStep, walkStep}; 
+		String[] metricName = {"Calories", "Distance", "RunStep", "TotalStep", "WalkStep"};
+		double[] metricValue = {calorie, distance, runStep, totalStep, walkStep}; 
 
 		if (table.equals("Raw")) {
 			writeRawQuery(table, deviceId, companyId, date, time, calorie, 
 					distance, runStep, totalStep, walkStep, deltaCalorie, deltaDistance,
 					deltaRunStep, deltaTotalStep, deltaWalkStep);
-		} else if (table.equals("DailyCompany") || table.equals("RTCompany")) {
+		} else if (table.equals("RTCompany")) {
 			for (int i = 0; i < metricName.length; i++) {
 				writeCompanyQuery(table, companyId, date, time, metricName[i], metricValue[i]);
 			}
-		} else if (table.equals("DailyUser") || table.equals("RTUser")) {
+		} else if (table.equals("RTUser") ) {
 			for (int i = 0; i < metricName.length; i++) {
 				writeUserQuery(table, deviceId, date, time, metricName[i], metricValue[i]);
 			}
 		} else {
 			System.out.println("ERROR: This is not a valid table name!");
 		}
+		
+		collector.emit(new Values("Done"));
 	}
 
 	@Override
@@ -161,7 +163,7 @@ public class DBWriterBolt extends BaseBasicBolt {
 	public static void writeCompanyQuery(String table, String companyId,
 			String date, String time, String metricName, double metricValue) {
 		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
-				+ "([comanpyId],[timestamp],[metric],[value]) VALUES ('"
+				+ "([companyId],[timestamp],[metric],[value]) VALUES ('"
 				+ companyId + "','" 
 				+ date + " " 
 				+ time + "','" 

@@ -7,7 +7,8 @@ import java.util.Properties;
 
 import storm.starter.bolt.CompanyAggregatorBolt;
 import storm.starter.bolt.DBWriterBolt;
-import storm.starter.bolt.FileWriterBolt;
+import storm.starter.bolt.RawDBWriterBolt;
+//import storm.starter.bolt.FileWriterBolt;
 import storm.starter.bolt.MessageReceiverBolt;
 import storm.starter.bolt.UserAggregatorBolt;
 import storm.starter.spout.ServiceBusQueueConnection;
@@ -21,6 +22,7 @@ import backtype.storm.tuple.Fields;
 public class ActivizeTopology {
 
 	public static void main(String[] args) throws Exception {
+		
 
 		Properties prop = new Properties();
 		try {
@@ -31,6 +33,7 @@ public class ActivizeTopology {
 		}
 
 		String connectionString = prop.getProperty("SB_CONNECTION");
+		//String connectionString = "Endpoint=sb://activize.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue=CEJLNtBcQpXZ5I7fPlWPvYtbPoSbiIr5zG7JVU+jUwo=";
 		String queueName = "fitnessdata";
 		String spoutId = "Spout";
 
@@ -44,16 +47,18 @@ public class ActivizeTopology {
 		// sets bolts
 		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 3)
 				.shuffleGrouping(spoutId);
+		builder.setBolt("RawDBWriterBolt", new RawDBWriterBolt(), 3)
+			.shuffleGrouping("MessageReceiverBolt");
 		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 3)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 3)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
-		builder.setBolt("UserDisplayBolt", new FileWriterBolt(), 3)
-				.shuffleGrouping("UserAggregatorBolt");
-//		builder.setBolt("UserDBWriterBolt", new DBWriterBolt(), 1)
+//		builder.setBolt("UserDisplayBolt", new FileWriterBolt(), 3)
 //				.shuffleGrouping("UserAggregatorBolt");
-//		builder.setBolt("CompanyDBWriterBolt", new DBWriterBolt(), 1)
-//				.shuffleGrouping("CompanyAggregateBolt");
+		builder.setBolt("UserDBWriterBolt", new DBWriterBolt(), 1)
+				.shuffleGrouping("UserAggregatorBolt");
+		builder.setBolt("CompanyDBWriterBolt", new DBWriterBolt(), 1)
+				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);
