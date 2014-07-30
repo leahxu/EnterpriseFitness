@@ -14,7 +14,7 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class RawDBWriterBolt extends BaseBasicBolt {
+public class RawDatabaseBolt extends BaseBasicBolt {
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -106,7 +106,7 @@ public class RawDBWriterBolt extends BaseBasicBolt {
 	public static void loadPropertiesDB(String sqlString) {
 		Properties prop = new Properties();
 		try {
-			prop.load(DBWriterBolt.class.getClassLoader().getResourceAsStream(
+			prop.load(RawDatabaseBolt.class.getClassLoader().getResourceAsStream(
 					"config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();

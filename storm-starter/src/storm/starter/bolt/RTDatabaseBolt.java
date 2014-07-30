@@ -31,21 +31,25 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		double totalStep = tuple.getDouble(8);
 		double walkStep = tuple.getDouble(9);
 
-		String[] metricName = {"Calories", "Distance", "RunStep", "TotalStep", "WalkStep"};
-		double[] metricValue = {calorie, distance, runStep, totalStep, walkStep}; 
+		String[] metricName = { "Calories", "Distance", "RunStep", "TotalStep",
+				"WalkStep" };
+		double[] metricValue = { calorie, distance, runStep, totalStep,
+				walkStep };
 
 		if (table.equals("RTCompany")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeCompanyQuery(table, companyId, date, time, metricName[i], metricValue[i]);
+				writeCompanyQuery(table, companyId, date, time, metricName[i],
+						metricValue[i]);
 			}
-		} else if (table.equals("RTUser") ) {
+		} else if (table.equals("RTUser")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeUserQuery(table, deviceId, date, time, metricName[i], metricValue[i]);
+				writeUserQuery(table, deviceId, date, time, metricName[i],
+						metricValue[i]);
 			}
 		} else {
 			System.out.println("ERROR: This is not a valid table name!");
 		}
-		
+
 		collector.emit(new Values("Done"));
 	}
 
@@ -54,11 +58,11 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		declarer.declare(new Fields("RTDatabaseWriter"));
 	}
 
-	public static void connectDB (String sqlString) {
-		
+	public static void connectDB(String sqlString) {
+
 		Properties prop = new Properties();
 		try {
-			prop.load(DBWriterBolt.class.getClassLoader().getResourceAsStream(
+			prop.load(RTDatabaseBolt.class.getClassLoader().getResourceAsStream(
 					"config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -69,7 +73,6 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		Statement statement = null; // For the SQL statement
 		ResultSet resultSet = null; // For the result set
 
-		
 		try {
 			// Ensure the SQL Server driver class is available.
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -82,7 +85,7 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 
 			// Execute the statement.
 			statement.executeUpdate(sqlString);
-			
+
 		}
 		// Exception handling
 		catch (ClassNotFoundException cnfe) {
@@ -100,22 +103,19 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 				if (null != resultSet) {
 					resultSet.close();
 				}
-				
+
 			} catch (SQLException sqlException) {
 				// No additional action if close() statements fail.
 			}
 		}
 	}
-	
+
 	public static void writeUserQuery(String table, String deviceId,
 			String date, String time, String metricName, double metricValue) {
 		String insert = "INSERT INTO [dbo].[" + table + "]"
 				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
-				+ deviceId + "','" 
-				+ date + " " 
-				+ time + "','" 
-				+ metricName + "'," 
-				+ metricValue + ")";
+				+ deviceId + "','" + date + " " + time + "','" + metricName
+				+ "'," + metricValue + ")";
 
 		connectDB(insert);
 	}
@@ -124,12 +124,32 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 			String date, String time, String metricName, double metricValue) {
 		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
 				+ "([companyId],[timestamp],[metric],[value]) VALUES ('"
-				+ companyId + "','" 
-				+ date + " " 
-				+ time + "','" 
-				+ metricName + "'," 
-				+ metricValue + ")";
+				+ companyId + "','" + date + " " + time + "','" + metricName
+				+ "'," + metricValue + ")";
 
 		connectDB(sqlQuery);
 	}
+
+	/*
+	 * public static void writeUserQuery(String table, String deviceId, String
+	 * date, String time, String metricName, double metricValue) { String insert
+	 * = "INSERT INTO [dbo].[" + table + "]" +
+	 * "([deviceId],[timestamp],[metric],[value]) VALUES ('" + deviceId + "','"
+	 * + date + " " + time + "','" + metricName + "'," + metricValue + ")";
+	 * 
+	 * String update = "UPDATE [dbo].[" + table + "] SET" + "timestamp = '" +
+	 * date + " " + time + "', metric = '" + metricName + "', value = " +
+	 * metricValue + "WHERE deviceId = '" + deviceId + "'";
+	 * 
+	 * String exist = "SELECT * FROM [dbo].[" + table + "] WHERE deviceId = '" +
+	 * deviceId + "'";
+	 * 
+	 * // Update and ResultSet do not work ResultSet result = connectDB(exist);
+	 * 
+	 * String sqlQuery = "";
+	 * 
+	 * if (result != null ){ sqlQuery = update; } else { sqlQuery = insert; }
+	 * 
+	 * connectDB(update); }
+	 */
 }

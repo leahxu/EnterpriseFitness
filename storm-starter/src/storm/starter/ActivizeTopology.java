@@ -8,7 +8,7 @@ import java.util.Properties;
 import storm.starter.bolt.CompanyAggregatorBolt;
 import storm.starter.bolt.RTDatabaseBolt;
 import storm.starter.bolt.DailyDatabaseBolt;
-import storm.starter.bolt.RawDBWriterBolt;
+import storm.starter.bolt.RawDatabaseBolt;
 import storm.starter.bolt.MessageReceiverBolt;
 import storm.starter.bolt.UserAggregatorBolt;
 
@@ -47,7 +47,7 @@ public class ActivizeTopology {
 		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 5)
 				.shuffleGrouping(spoutId);
 		
-		builder.setBolt("RawDBWriterBolt", new RawDBWriterBolt(), 5)
+		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 5)
 				.shuffleGrouping("MessageReceiverBolt");
 		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 5)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
@@ -59,10 +59,11 @@ public class ActivizeTopology {
 		builder.setBolt("CompanyRTDatabaseBolt", new RTDatabaseBolt(), 5)
 				.shuffleGrouping("CompanyAggregatorBolt");
 		
-		builder.setBolt("UserDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
-				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("CompanyDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
-				.shuffleGrouping("CompanyAggregatorBolt");
+		// Unnecessarily if we can do it from the database side
+//		builder.setBolt("UserDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
+//				.shuffleGrouping("UserAggregatorBolt");
+//		builder.setBolt("CompanyDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
+//				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);
