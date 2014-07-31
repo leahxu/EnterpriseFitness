@@ -6,12 +6,11 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 import storm.starter.bolt.CompanyAggregatorBolt;
-import storm.starter.bolt.RTDatabaseBolt;
 import storm.starter.bolt.DailyDatabaseBolt;
-import storm.starter.bolt.RawDatabaseBolt;
 import storm.starter.bolt.MessageReceiverBolt;
+import storm.starter.bolt.RTDatabaseBolt;
+import storm.starter.bolt.RawDatabaseBolt;
 import storm.starter.bolt.UserAggregatorBolt;
-
 import storm.starter.spout.ServiceBusQueueConnection;
 import storm.starter.spout.ServiceBusQueueSpout;
 import storm.starter.spout.interfaces.IServiceBusQueueDetail;
@@ -41,29 +40,28 @@ public class ActivizeTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 
 		// sets spout, connects to ServiceBus Queue
-		builder.setSpout(spoutId, new ServiceBusQueueSpout(connection), 6);
+		builder.setSpout(spoutId, new ServiceBusQueueSpout(connection), 8);
 
 		// sets bolts
-		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 5)
+		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 8)
 				.shuffleGrouping(spoutId);
-		
-		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 5)
+
+		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
 				.shuffleGrouping("MessageReceiverBolt");
-		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 5)
+		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
-		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 5)
+		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
-		
-		builder.setBolt("UserRTDatabaseBolt", new RTDatabaseBolt(), 5)
+
+		builder.setBolt("UserRTDatabaseBolt", new RTDatabaseBolt(), 8)
 				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("CompanyRTDatabaseBolt", new RTDatabaseBolt(), 5)
+		builder.setBolt("CompanyRTDatabaseBolt", new RTDatabaseBolt(), 8)
 				.shuffleGrouping("CompanyAggregatorBolt");
-		
-		// Unnecessarily if we can do it from the database side
-//		builder.setBolt("UserDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
-//				.shuffleGrouping("UserAggregatorBolt");
-//		builder.setBolt("CompanyDailyDatabaseBolt", new DailyDatabaseBolt(), 5)
-//				.shuffleGrouping("CompanyAggregatorBolt");
+
+		builder.setBolt("UserDailyDatabaseBolt", new DailyDatabaseBolt(), 2)
+				.shuffleGrouping("UserAggregatorBolt");
+		builder.setBolt("CompanyDailyDatabaseBolt", new DailyDatabaseBolt(), 2)
+				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);

@@ -53,7 +53,7 @@ public class RawDatabaseBolt extends BaseBasicBolt {
 				+ deltaRunStep + ","
 				+ deltaTotalStep + "," + deltaWalkStep + ")";
 
-		loadPropertiesDB(sqlQuery);
+		connectDB(sqlQuery);
 	}
 
 	@Override
@@ -61,8 +61,16 @@ public class RawDatabaseBolt extends BaseBasicBolt {
 		declarer.declare(new Fields("DBWriter"));
 	}
 
-	public static void connectDB(String connectionString, String sqlString) {
+	public static void connectDB(String sqlQuery) {
+		Properties prop = new Properties();
+		try {
+			prop.load(RawDatabaseBolt.class.getClassLoader().getResourceAsStream(
+					"config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
+		String connectionString = prop.getProperty("SQL_CONNECTION");
 		Connection connection = null; // For making the connection
 		Statement statement = null; // For the SQL statement
 		ResultSet resultSet = null; // For the result set
@@ -78,7 +86,7 @@ public class RawDatabaseBolt extends BaseBasicBolt {
 			statement = connection.createStatement();
 
 			// Execute the statement.
-			statement.executeUpdate(sqlString);
+			statement.executeUpdate(sqlQuery);
 
 		}
 		// Exception handling
@@ -100,20 +108,5 @@ public class RawDatabaseBolt extends BaseBasicBolt {
 				// No additional action if close() statements fail.
 			}
 		}
-
-	}
-
-	public static void loadPropertiesDB(String sqlString) {
-		Properties prop = new Properties();
-		try {
-			prop.load(RawDatabaseBolt.class.getClassLoader().getResourceAsStream(
-					"config.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		String connectionString = prop.getProperty("SQL_CONNECTION");
-
-		connectDB(connectionString, sqlString);
 	}
 }

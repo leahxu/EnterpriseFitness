@@ -36,14 +36,17 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		double[] metricValue = { calorie, distance, runStep, totalStep,
 				walkStep };
 
-		if (table.equals("RTCompany")) {
+		if (table.equals("Company")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeCompanyQuery(table, companyId, date, time, metricName[i],
+				writeCompanyQuery(companyId, date, time, metricName[i],
 						metricValue[i]);
 			}
-		} else if (table.equals("RTUser")) {
+					
+			leaderboardQuery(companyId, date, time, calorie, distance, runStep, walkStep, totalStep);
+			
+		} else if (table.equals("User")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeUserQuery(table, deviceId, date, time, metricName[i],
+				writeUserQuery(deviceId, date, time, metricName[i],
 						metricValue[i]);
 			}
 		} else {
@@ -58,12 +61,12 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		declarer.declare(new Fields("RTDatabaseWriter"));
 	}
 
-	public static void connectDB(String sqlString) {
+	public static void connectDB(String sqlQuery) {
 
 		Properties prop = new Properties();
 		try {
-			prop.load(RTDatabaseBolt.class.getClassLoader().getResourceAsStream(
-					"config.properties"));
+			prop.load(RTDatabaseBolt.class.getClassLoader()
+					.getResourceAsStream("config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -84,7 +87,7 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 			statement = connection.createStatement();
 
 			// Execute the statement.
-			statement.executeUpdate(sqlString);
+			resultSet = statement.executeQuery(sqlQuery);
 
 		}
 		// Exception handling
@@ -110,46 +113,55 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 		}
 	}
 
-	public static void writeUserQuery(String table, String deviceId,
-			String date, String time, String metricName, double metricValue) {
-		String insert = "INSERT INTO [dbo].[" + table + "]"
-				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
-				+ deviceId + "','" + date + " " + time + "','" + metricName
-				+ "'," + metricValue + ")";
+	public static void writeUserQuery(String deviceId, String date,
+			String time, String metricName, double metricValue) {
 
-		connectDB(insert);
+		String query = 
+				"IF (NOT EXISTS(SELECT * FROM [dbo].[RTUser] WHERE [deviceId] = '"
+					+ deviceId + "' AND [metric] = '" + metricName + "')) " + 
+				"BEGIN " +
+					"INSERT INTO [dbo].[RTUser]([deviceId],[timestamp],[metric],[value]) " + 
+					"VALUES ('" + deviceId + "','" + date + " " + time
+					+ "','" + metricName + "'," + metricValue + ") " +
+				"END " +
+				"ELSE " +
+				"BEGIN " +
+					"UPDATE [dbo].[RTUser] SET [timestamp] = '" + date + " "
+					+ time + "', [value] = " + metricValue + "WHERE [deviceId] = '"
+					+ deviceId + "' AND [metric] = '" + metricName + "' " + 
+				"END";
+
+		connectDB(query);
 	}
 
-	public static void writeCompanyQuery(String table, String companyId,
-			String date, String time, String metricName, double metricValue) {
-		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
-				+ "([companyId],[timestamp],[metric],[value]) VALUES ('"
-				+ companyId + "','" + date + " " + time + "','" + metricName
-				+ "'," + metricValue + ")";
+	public static void writeCompanyQuery(String companyId, String date,
+			String time, String metricName, double metricValue) {
+		String query = 
+			"IF (NOT EXISTS(SELECT * FROM [dbo].[RTCompany] WHERE [companyId] = '"
+				+ companyId + "' AND [metric] = '" + metricName + "')) " + 
+			"BEGIN " +
+				"INSERT INTO [dbo].[RTCompany]([companyId],[timestamp],[metric],[value]) " + 
+				"VALUES ('" + companyId + "','" + date + " " + time
+				+ "','" + metricName + "'," + metricValue + ") " +
+			"END " +
+			"ELSE " +
+			"BEGIN " +
+				"UPDATE [dbo].[RTCompany] SET [timestamp] = '" + date + " "
+				+ time + "', [value] = " + metricValue + "WHERE [companyId] = '"
+				+ companyId + "' AND [metric] = '" + metricName + "' " + 
+			"END";
 
-		connectDB(sqlQuery);
+		connectDB(query);
 	}
-
-	/*
-	 * public static void writeUserQuery(String table, String deviceId, String
-	 * date, String time, String metricName, double metricValue) { String insert
-	 * = "INSERT INTO [dbo].[" + table + "]" +
-	 * "([deviceId],[timestamp],[metric],[value]) VALUES ('" + deviceId + "','"
-	 * + date + " " + time + "','" + metricName + "'," + metricValue + ")";
-	 * 
-	 * String update = "UPDATE [dbo].[" + table + "] SET" + "timestamp = '" +
-	 * date + " " + time + "', metric = '" + metricName + "', value = " +
-	 * metricValue + "WHERE deviceId = '" + deviceId + "'";
-	 * 
-	 * String exist = "SELECT * FROM [dbo].[" + table + "] WHERE deviceId = '" +
-	 * deviceId + "'";
-	 * 
-	 * // Update and ResultSet do not work ResultSet result = connectDB(exist);
-	 * 
-	 * String sqlQuery = "";
-	 * 
-	 * if (result != null ){ sqlQuery = update; } else { sqlQuery = insert; }
-	 * 
-	 * connectDB(update); }
-	 */
+	
+	public static void leaderboardQuery(String companyId, String date,
+			String time, double calorie, double distance, double runStep, 
+			double walkStep, double totalStep) {
+		String insert = "INSERT INTO [dbo].[Leaderboard]"
+				+ "([timestamp],[companyId],[totalStep],[runStep],[walkStep],[calories],[distance]) VALUES ('"
+				+ date + " " + time + "','" + companyId + "'," + totalStep 
+				+ "," + runStep + "," + walkStep + "," + calorie + "," + distance + ")";
+		
+		connectDB(insert); 
+	}
 }

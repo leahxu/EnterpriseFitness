@@ -19,16 +19,12 @@ public class UserAggregatorBolt extends BaseBasicBolt {
 		String companyId = tuple.getString(1);
 		String date = tuple.getString(2);
 		String time = tuple.getString(3);
+		
 		double calorie = tuple.getDouble(4);
 		double distance = tuple.getDouble(5);
 		double runStep = tuple.getDouble(6);
 		double totalStep = tuple.getDouble(7);
 		double walkStep = tuple.getDouble(8);
-		double deltaCalorie = tuple.getDouble(9);
-		double deltaDistance = tuple.getDouble(10);
-		double deltaRunStep = tuple.getDouble(11);
-		double deltaTotalStep = tuple.getDouble(12);
-		double deltaWalkStep = tuple.getDouble(13);
 
 		if (!userData.containsKey(deviceId)) {
 			userData.put(deviceId, new HashMap<String, Double>());
@@ -40,16 +36,14 @@ public class UserAggregatorBolt extends BaseBasicBolt {
 		userData.get(deviceId).put("totalStep", totalStep);
 		userData.get(deviceId).put("walkStep", walkStep);
 
-		collector.emit(new Values("RTUser", deviceId, companyId, date, time, calorie,
-				distance, runStep, totalStep, walkStep, deltaCalorie,
-				deltaDistance, deltaRunStep, deltaTotalStep, deltaWalkStep));
+		collector.emit(new Values("User", deviceId, companyId, date, time,
+				calorie, distance, runStep, totalStep, walkStep));
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("table", "deviceId", "companyId", "date", "time",
-				"calorie", "distance", "runStep", "totalStep", "walkStep",
-				"deltaCalorie", "deltaDistance", "deltaRunStep",
-				"deltaTotalStep", "deltaWalkStep"));
+		declarer.declare(new Fields("table", "deviceId", "companyId", "date",
+				"time", "calorie", "distance", "runStep", "totalStep",
+				"walkStep"));
 	}
 }

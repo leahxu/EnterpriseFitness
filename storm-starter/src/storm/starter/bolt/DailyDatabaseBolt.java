@@ -36,14 +36,14 @@ public class DailyDatabaseBolt extends BaseBasicBolt {
 		double[] metricValue = { calorie, distance, runStep, totalStep,
 				walkStep };
 
-		if (table.equals("DailyCompany")) {
+		if (table.equals("Company")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeCompanyQuery(table, companyId, date, time, metricName[i],
+				writeCompanyQuery(companyId, date, time, metricName[i],
 						metricValue[i]);
 			}
-		} else if (table.equals("DailyUser")) {
+		} else if (table.equals("User")) {
 			for (int i = 0; i < metricName.length; i++) {
-				writeUserQuery(table, deviceId, date, time, metricName[i],
+				writeUserQuery(deviceId, date, time, metricName[i],
 						metricValue[i]);
 			}
 		} else {
@@ -55,10 +55,10 @@ public class DailyDatabaseBolt extends BaseBasicBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("RTDatabaseWriter"));
+		declarer.declare(new Fields("DailyDatabaseWriter"));
 	}
 
-	public static void connectDB(String sqlString) {
+	public static void connectDB(String sqlQuery) {
 
 		Properties prop = new Properties();
 		try {
@@ -85,7 +85,7 @@ public class DailyDatabaseBolt extends BaseBasicBolt {
 			statement = connection.createStatement();
 
 			// Execute the statement.
-			statement.executeUpdate(sqlString);
+			statement.executeUpdate(sqlQuery);
 
 		}
 		// Exception handling
@@ -111,9 +111,9 @@ public class DailyDatabaseBolt extends BaseBasicBolt {
 		}
 	}
 
-	public static void writeUserQuery(String table, String deviceId,
+	public static void writeUserQuery(String deviceId,
 			String date, String time, String metricName, double metricValue) {
-		String insert = "INSERT INTO [dbo].[" + table + "]"
+		String insert = "INSERT INTO [dbo].[DailyUser]"
 				+ "([deviceId],[timestamp],[metric],[value]) VALUES ('"
 				+ deviceId + "','" + date + " " + time + "','" + metricName
 				+ "'," + metricValue + ")";
@@ -121,9 +121,9 @@ public class DailyDatabaseBolt extends BaseBasicBolt {
 		connectDB(insert);
 	}
 
-	public static void writeCompanyQuery(String table, String companyId,
+	public static void writeCompanyQuery(String companyId,
 			String date, String time, String metricName, double metricValue) {
-		String sqlQuery = "INSERT INTO [dbo].[" + table + "]"
+		String sqlQuery = "INSERT INTO [dbo].[DailyCompany]"
 				+ "([companyId],[timestamp],[metric],[value]) VALUES ('"
 				+ companyId + "','" + date + " " + time + "','" + metricName
 				+ "'," + metricValue + ")";
