@@ -1,4 +1,4 @@
-package storm.starter.spout;
+package activize.spout;
 
 import org.apache.log4j.Logger;
 

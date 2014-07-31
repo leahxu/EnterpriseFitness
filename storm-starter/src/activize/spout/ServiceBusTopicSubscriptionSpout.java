@@ -1,85 +1,73 @@
-package storm.starter.spout;
+package activize.spout;
 
-import storm.starter.spout.interfaces.IServiceBusQueueDetail;
+import activize.spout.interfaces.IServiceBusTopicDetail;
 import backtype.storm.spout.*;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class ServiceBusQueueSpout extends BaseRichSpout {
-    private IServiceBusQueueDetail detail;
+public class ServiceBusTopicSubscriptionSpout extends BaseRichSpout implements Serializable {
+
+    private IServiceBusTopicDetail detail;
     private SpoutOutputCollector collector;
     private long processedMessages = 0L;
 
-    static final Logger logger = Logger.getLogger("storm.starter.spout.interfaces.ServiceBusQueueSpout");
+    static final Logger logger = Logger.getLogger("elastacloud.storm.com.elastacloud.storm.interfaces.ServiceBusTopicConnection");
 
-    public ServiceBusQueueSpout(IServiceBusQueueDetail detail)  {
-         this.detail = detail;
+    public ServiceBusTopicSubscriptionSpout(IServiceBusTopicDetail detail)  {
+        this.detail = detail;
     }
 
-    public ServiceBusQueueSpout(String connectionString, String queueName) throws ServiceBusSpoutException  {
-        this.detail = new ServiceBusQueueConnection(connectionString, queueName);
+    public ServiceBusTopicSubscriptionSpout(String connectionString, String topicName, String subscriptionName) throws ServiceBusSpoutException  {
+        this.detail = new ServiceBusTopicConnection(connectionString, topicName, subscriptionName, null);
     }
 
     @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
-
         try {
-            logger.info("connecting to service bus queue " + this.detail.getQueueName());
             this.detail.connect();
             this.collector = spoutOutputCollector;
         }
-        catch(ServiceBusSpoutException sbpe) { 
-        	/* log this somewhere - maybe another service bus exception queue */
-        }
+        catch(ServiceBusSpoutException sbpe)    { /* log this somewhere - maybe another service bus exception queue */}
 
     }
 
     @Override
     public void close() {
-        logger.info("closing service bus contract ");
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void nextTuple() {
         // we'll try this on the main thread - if there is a problem then we'll implement runnable
         // check performance against this approach but we can let the spout scale rather than scale ourselves
-        try {
-            logger.info("attempting to get next message from queue " + this.detail.getQueueName());
+        try{
             if(!this.detail.isConnected())
                 return;
-            
-            //Utils.sleep(500);
-            
+
+            logger.info("getting next message");
             // this message can be anything - most likely JSON but we don't impose a structure in the spout
             String message = this.detail.getNextMessageForSpout();
-            logger.info("Received message is null: " + (message == null));
 
-            //pointless emitting a null message
+            //pointless emitting if there is no message
             if(message == null)
                 return;
 
             collector.emit(new Values(message));
             processedMessages++;
         }
-        catch(ServiceBusSpoutException sbse)    {
-            // if this occurs we probably want to passthru - maybe a short sleep to unlock the thread
+        catch(ServiceBusSpoutException sbse)    {                  // if this occurs we probably want to passthru - maybe a short sleep to unlock the thread
             // TODO: look at adding a retry-fail strategy if this continually dies then it maybe that we're connected but something
-            logger.error(sbse.getMessage());
             // has happened to the SB namespace
-            try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+            try{Thread.sleep(500);} catch(InterruptedException ie) {};
         }
     }
     @Override

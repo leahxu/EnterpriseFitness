@@ -1,4 +1,4 @@
-package storm.starter.bolt;
+package activize.bolt;
 
 import java.io.IOException;
 import java.sql.Connection;

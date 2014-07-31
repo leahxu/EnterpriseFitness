@@ -1,4 +1,4 @@
-package storm.starter.bolt;
+package activize.bolt;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -8,7 +8,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import storm.starter.PedometerData;
+import activize.PedometerData;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;

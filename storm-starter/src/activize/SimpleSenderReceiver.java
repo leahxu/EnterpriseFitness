@@ -1,4 +1,4 @@
-package storm.starter;
+package activize;
 
 import javax.jms.*;
 import javax.naming.Context;

@@ -1,11 +1,13 @@
-package storm.starter.spout;
+package activize.spout;
 
-import storm.starter.spout.interfaces.IServiceBusQueueDetail;
+
+import activize.spout.interfaces.IServiceBusQueueDetail;
 
 // Include the following imports to use service bus APIs
 import com.microsoft.windowsazure.services.serviceBus.*;
 import com.microsoft.windowsazure.services.serviceBus.models.*;
 import com.microsoft.windowsazure.services.core.*;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -20,7 +22,7 @@ public class ServiceBusQueueConnection implements IServiceBusQueueDetail, Serial
     private ServiceBusContract serviceBusContract = null;
     private Boolean isConnected = false;
 
-    static final Logger logger = Logger.getLogger("storm.starter.spout.interfaces.ServiceBusQueueConnection");
+    static final Logger logger = Logger.getLogger("activize.spout.interfaces.ServiceBusQueueConnection");
 
     public ServiceBusQueueConnection(String connectionString, String queueName) throws ServiceBusSpoutException {
         this.connectionString = connectionString;

@@ -178,9 +178,6 @@
 		<testSourceDirectory>test/jvm</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${basedir}/multilang</directory>
-			</resource>
-			<resource>
 				<directory>${basedir}</directory>
 				<includes>
 					<include>config.properties</include>
@@ -223,8 +220,6 @@
 						<sourceDirectory>src/clj</sourceDirectory>
 					</sourceDirectories>
 				</configuration>
-				<!--<executions> <execution> <id>compile</id> <phase>compile</phase> 
-					<goals> <goal>compile</goal> </goals> </execution> </executions> -->
 			</plugin>
 
 			<plugin>

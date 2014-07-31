@@ -1,4 +1,4 @@
-package storm.starter;
+package activize;
 
 public class PedometerData {
 	private String deviceId;

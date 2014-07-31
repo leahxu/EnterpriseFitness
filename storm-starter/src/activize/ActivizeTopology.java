@@ -1,19 +1,19 @@
-package storm.starter;
+package activize;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import storm.starter.bolt.CompanyAggregatorBolt;
-import storm.starter.bolt.DailyDatabaseBolt;
-import storm.starter.bolt.MessageReceiverBolt;
-import storm.starter.bolt.RTDatabaseBolt;
-import storm.starter.bolt.RawDatabaseBolt;
-import storm.starter.bolt.UserAggregatorBolt;
-import storm.starter.spout.ServiceBusQueueConnection;
-import storm.starter.spout.ServiceBusQueueSpout;
-import storm.starter.spout.interfaces.IServiceBusQueueDetail;
+import activize.bolt.CompanyAggregatorBolt;
+import activize.bolt.DailyDatabaseBolt;
+import activize.bolt.MessageReceiverBolt;
+import activize.bolt.RTDatabaseBolt;
+import activize.bolt.RawDatabaseBolt;
+import activize.bolt.UserAggregatorBolt;
+import activize.spout.ServiceBusQueueConnection;
+import activize.spout.ServiceBusQueueSpout;
+import activize.spout.interfaces.IServiceBusQueueDetail;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;

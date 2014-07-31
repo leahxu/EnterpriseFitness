@@ -1,6 +1,7 @@
-package storm.starter.spout;
+package activize.spout;
 
-import storm.starter.spout.interfaces.IServiceBusTopicDetail;
+
+import activize.spout.interfaces.IServiceBusTopicDetail;
 
 // Include the following imports to use service bus APIs
 import com.microsoft.windowsazure.services.serviceBus.*;

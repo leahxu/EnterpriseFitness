@@ -1,6 +1,6 @@
-package storm.starter.spout.interfaces;
+package activize.spout.interfaces;
 
-import storm.starter.spout.ServiceBusSpoutException;
+import activize.spout.ServiceBusSpoutException;
 
 public interface IServiceBusDetail {
     public String getConnectionString() throws ServiceBusSpoutException;

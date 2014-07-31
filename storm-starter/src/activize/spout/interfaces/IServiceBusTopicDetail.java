@@ -1,6 +1,6 @@
-package storm.starter.spout.interfaces;
+package activize.spout.interfaces;
 
-import storm.starter.spout.ServiceBusSpoutException;
+import activize.spout.ServiceBusSpoutException;
 
 /** Interface used to return the details of a service bus topic  */
 public interface IServiceBusTopicDetail extends IServiceBusDetail {
