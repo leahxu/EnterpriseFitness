@@ -11,6 +11,7 @@ import java.util.Random;
 public class SimpleSenderReceiver implements MessageListener {
     private static boolean runReceiver = true;
     private Connection connection;
+    private Connection receiveConnection;
     private Session sendSession;
     private Session receiveSession;
     private MessageProducer sender;
@@ -26,8 +27,13 @@ public class SimpleSenderReceiver implements MessageListener {
         Context context = new InitialContext(env);
 
         // Lookup ConnectionFactory and Queue
-        ConnectionFactory cf = (ConnectionFactory) context.lookup("SBCF");
-        Destination queue = (Destination) context.lookup("QUEUE");
+        ConnectionFactory cf = (ConnectionFactory) context.lookup("EHPublisher");
+        Destination queue = (Destination) context.lookup("EH");
+        
+        ConnectionFactory receiveCF = (ConnectionFactory) context.lookup("EHListener");
+        Destination receiveQueue = (Destination) context.lookup("EH");
+        
+        receiveConnection = receiveCF.createConnection();
 
         // Create Connection
         connection = cf.createConnection();
@@ -38,8 +44,8 @@ public class SimpleSenderReceiver implements MessageListener {
 
         if (runReceiver) {
             // Create receiver-side Session, MessageConsumer,and MessageListener
-            receiveSession = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
-            receiver = receiveSession.createConsumer(queue);
+            receiveSession = receiveConnection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+            receiver = receiveSession.createConsumer(receiveQueue);
             receiver.setMessageListener(this);
             connection.start();
         }

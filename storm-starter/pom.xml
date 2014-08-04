@@ -19,10 +19,10 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>storm-starter</artifactId>
+	<artifactId>activize</artifactId>
 	<packaging>jar</packaging>
 
-	<name>storm-starter</name>
+	<name>activize</name>
 
 	<repositories>
 		<repository>
