@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 import activize.bolt.CompanyAggregatorBolt;
-import activize.bolt.DailyDatabaseBolt;
 import activize.bolt.MessageReceiverBolt;
-import activize.bolt.RTDatabaseBolt;
+import activize.bolt.DBWriterBolt;
 import activize.bolt.RawDatabaseBolt;
 import activize.bolt.UserAggregatorBolt;
+import activize.spout.EventHubSpout;
 import activize.spout.ServiceBusQueueConnection;
 import activize.spout.ServiceBusQueueSpout;
 import activize.spout.interfaces.IServiceBusQueueDetail;
@@ -41,6 +41,7 @@ public class ActivizeTopology {
 
 		// sets spout, connects to ServiceBus Queue
 		builder.setSpout(spoutId, new ServiceBusQueueSpout(connection), 8);
+//		builder.setSpout(spoutId, new EventHubSpout(), 1); 
 
 		// sets bolts
 		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 8)
@@ -53,14 +54,9 @@ public class ActivizeTopology {
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
 
-		builder.setBolt("UserRTDatabaseBolt", new RTDatabaseBolt(), 8)
+		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
 				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("CompanyRTDatabaseBolt", new RTDatabaseBolt(), 8)
-				.shuffleGrouping("CompanyAggregatorBolt");
-
-		builder.setBolt("UserDailyDatabaseBolt", new DailyDatabaseBolt(), 2)
-				.shuffleGrouping("UserAggregatorBolt");
-		builder.setBolt("CompanyDailyDatabaseBolt", new DailyDatabaseBolt(), 2)
+		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)
 				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();

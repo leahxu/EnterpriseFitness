@@ -15,7 +15,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class RTDatabaseBolt extends BaseBasicBolt {
+public class DBWriterBolt extends BaseBasicBolt {
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -44,6 +44,13 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 					
 			leaderboardQuery(companyId, date, time, calorie, distance, runStep, walkStep, totalStep);
 			
+		} else if (table.equals("DailyCompany")) {
+			String queryDaily = 
+				"INSERT INTO [dbo].[DailyCompany]([companyId],[timestamp],[metric],[value]) " + 
+				"VALUES ('" + companyId + "','" + date + " " + time
+				+ "','" + metricName + "'," + metricValue + ")";
+			
+			connectDB(queryDaily);
 		} else if (table.equals("User")) {
 			for (int i = 0; i < metricName.length; i++) {
 				writeUserQuery(deviceId, date, time, metricName[i],
@@ -65,7 +72,7 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 
 		Properties prop = new Properties();
 		try {
-			prop.load(RTDatabaseBolt.class.getClassLoader()
+			prop.load(DBWriterBolt.class.getClassLoader()
 					.getResourceAsStream("config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -116,7 +123,7 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 	public static void writeUserQuery(String deviceId, String date,
 			String time, String metricName, double metricValue) {
 
-		String query = 
+		String queryRT = 
 				"IF (NOT EXISTS(SELECT * FROM [dbo].[RTUser] WHERE [deviceId] = '"
 					+ deviceId + "' AND [metric] = '" + metricName + "')) " + 
 				"BEGIN " +
@@ -130,13 +137,29 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 					+ time + "', [value] = " + metricValue + "WHERE [deviceId] = '"
 					+ deviceId + "' AND [metric] = '" + metricName + "' " + 
 				"END";
+		
+		String queryDaily = 
+			"IF (NOT EXISTS(SELECT * FROM [dbo].[DailyUser] WHERE [deviceId] = '"
+				+ deviceId + "' AND [metric] = '" + metricName + "' AND [timestamp] = '" + date + "' )) " + 
+			"BEGIN " +
+				"INSERT INTO [dbo].[DailyUser]([deviceId],[timestamp],[metric],[value]) " + 
+				"VALUES ('" + deviceId + "','" + date
+				+ "','" + metricName + "'," + metricValue + ") " +
+			"END " +
+			"ELSE " +
+			"BEGIN " +
+				"UPDATE [dbo].[DailyUser] SET [value] = " + metricValue + "WHERE [deviceId] = '"
+				+ deviceId + "' AND [metric] = '" + metricName + "' AND [timestamp] = '" 
+				+ date + "' " +
+			"END";
 
-		connectDB(query);
+		connectDB(queryRT);
+		connectDB(queryDaily);
 	}
 
 	public static void writeCompanyQuery(String companyId, String date,
 			String time, String metricName, double metricValue) {
-		String query = 
+		String queryRT = 
 			"IF (NOT EXISTS(SELECT * FROM [dbo].[RTCompany] WHERE [companyId] = '"
 				+ companyId + "' AND [metric] = '" + metricName + "')) " + 
 			"BEGIN " +
@@ -150,18 +173,47 @@ public class RTDatabaseBolt extends BaseBasicBolt {
 				+ time + "', [value] = " + metricValue + "WHERE [companyId] = '"
 				+ companyId + "' AND [metric] = '" + metricName + "' " + 
 			"END";
+		
+		String queryDaily = 
+			"IF (NOT EXISTS(SELECT * FROM [dbo].[DailyCompany] WHERE [companyId] = '"
+				+ companyId + "' AND [metric] = '" + metricName + "' AND [timestamp] = '" + date + "' )) " + 
+			"BEGIN " +
+				"INSERT INTO [dbo].[DailyCompany]([companyId],[timestamp],[metric],[value]) " + 
+				"VALUES ('" + companyId + "','" + date 
+				+ "','" + metricName + "'," + metricValue + ") " +
+			"END " +
+			"ELSE " +
+			"BEGIN " +
+				"UPDATE [dbo].[DailyCompany] SET [value] = " + metricValue + "WHERE [companyId] = '"
+				+ companyId + "' AND [metric] = '" + metricName + "' AND [timestamp] = '" 
+				+ date + "' " +
+			"END";
 
-		connectDB(query);
+		connectDB(queryRT);
+		connectDB(queryDaily);
 	}
 	
 	public static void leaderboardQuery(String companyId, String date,
 			String time, double calorie, double distance, double runStep, 
 			double walkStep, double totalStep) {
-		String insert = "INSERT INTO [dbo].[Leaderboard]"
+		
+		String query = 
+			"IF (NOT EXISTS(SELECT * FROM [dbo].[Leaderboard] WHERE [companyId] = '"
+					+ companyId + "')) " + 
+			"BEGIN " +
+				"INSERT INTO [dbo].[Leaderboard]"
 				+ "([timestamp],[companyId],[totalStep],[runStep],[walkStep],[calories],[distance]) VALUES ('"
 				+ date + " " + time + "','" + companyId + "'," + totalStep 
-				+ "," + runStep + "," + walkStep + "," + calorie + "," + distance + ")";
+				+ "," + runStep + "," + walkStep + "," + calorie + "," + distance + ")" +
+			"END " +
+			"ELSE " +
+			"BEGIN " +
+				"UPDATE [dbo].[Leaderboard] SET [timestamp] = '" + date + " "
+				+ time + "', [totalStep] = " + totalStep + ", [runStep] = " + runStep
+				+ ", [walkStep] = " + walkStep + ", [calories] = " + calorie + ", [distance] = " 
+				+ distance + "WHERE [companyId] = '" + companyId + "' " +
+			"END";
 		
-		connectDB(insert); 
+		connectDB(query); 
 	}
 }

@@ -28,12 +28,7 @@ public class SimpleSenderReceiver implements MessageListener {
 
         // Lookup ConnectionFactory and Queue
         ConnectionFactory cf = (ConnectionFactory) context.lookup("EHPublisher");
-        Destination queue = (Destination) context.lookup("EH");
-        
-        ConnectionFactory receiveCF = (ConnectionFactory) context.lookup("EHListener");
-        Destination receiveQueue = (Destination) context.lookup("EH");
-        
-        receiveConnection = receiveCF.createConnection();
+        Destination queue = (Destination) context.lookup("EHSend");
 
         // Create Connection
         connection = cf.createConnection();
@@ -41,7 +36,11 @@ public class SimpleSenderReceiver implements MessageListener {
         // Create sender-side Session and MessageProducer
         sendSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         sender = sendSession.createProducer(queue);
-
+        
+        // Receive side
+        ConnectionFactory receiveCF = (ConnectionFactory) context.lookup("EHListener");
+        Destination receiveQueue = (Destination) context.lookup("EHReceive");
+        receiveConnection = receiveCF.createConnection();
         if (runReceiver) {
             // Create receiver-side Session, MessageConsumer,and MessageListener
             receiveSession = receiveConnection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
