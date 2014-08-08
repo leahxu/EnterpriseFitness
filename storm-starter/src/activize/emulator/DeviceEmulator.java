@@ -1,4 +1,4 @@
-package activize;
+package activize.emulator;
 
 import java.io.IOException;
 import java.util.ArrayList;

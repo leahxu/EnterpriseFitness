@@ -1,4 +1,4 @@
-package activize;
+package activize.emulator;
 
 public class MockDevice {
 	double calorie; 

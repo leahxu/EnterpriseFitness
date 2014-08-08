@@ -1,4 +1,4 @@
-package activize;
+package activize.emulator;
 
 import javax.jms.*;
 import javax.naming.Context;
