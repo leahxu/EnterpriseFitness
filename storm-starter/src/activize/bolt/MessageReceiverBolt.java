@@ -22,19 +22,21 @@ public class MessageReceiverBolt extends BaseBasicBolt {
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
 		String input = tuple.getString(0);
-		String cleanInput = "";
+		input = input.replace("AmqpValue{(java.lang.String)", "");
+		input = input.substring(0, input.length()-1);
+		
+//		Pattern pattern = Pattern.compile("(\\{.*?\\})");
+//		Matcher matcher = pattern.matcher(input);
+//
+//		while (matcher.find()) {
+//			cleanInput = matcher.group(1);
+//		}
 
-		Pattern pattern = Pattern.compile("(\\{.*?\\})");
-		Matcher matcher = pattern.matcher(input);
-
-		while (matcher.find()) {
-			cleanInput = matcher.group(1);
-		}
+		//System.out.println(cleanInput);
 
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			PedometerData data = mapper.readValue(cleanInput,
-					PedometerData.class);
+			PedometerData data = mapper.readValue(input, PedometerData.class);
 			collector.emit(new Values(data.getDeviceId(), data.getCompanyId(),
 					data.getDate(), data.getTime(), data.getCalorie(),
 					data.getDistance(), data.getRunStep(), data.getTotalStep(),

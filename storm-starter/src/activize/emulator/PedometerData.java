@@ -32,6 +32,23 @@ public class PedometerData {
 		this.deltaTotalStep = 0;
 		this.deltaWalkStep = 0; 
 	}
+	
+	public PedometerData() {
+		this.deviceId = ""; 
+		this.companyId = ""; 
+		this.date = ""; 
+		this.time = ""; 
+		this.calorie = 0; 
+		this.distance = 0; 
+		this.runStep = 0; 
+		this.totalStep = 0;
+		this.walkStep = 0; 
+		this.deltaCalorie = 0; 
+		this.deltaDistance = 0; 
+		this.deltaRunStep = 0; 
+		this.deltaTotalStep = 0;
+		this.deltaWalkStep = 0; 
+	}
 
 	public String getDeviceId() {
 		return deviceId;

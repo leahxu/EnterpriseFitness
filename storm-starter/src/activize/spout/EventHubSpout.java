@@ -98,6 +98,7 @@ public class EventHubSpout extends BaseRichSpout {
 					throw new UnsupportedOperationException();
 				}
 			});
+			
 			String protocol = url.getProtocol();
 			boolean ssl = "amqps".equals(protocol);
 			amqpHost = url.getHost();
@@ -127,8 +128,10 @@ public class EventHubSpout extends BaseRichSpout {
 			e.printStackTrace();
 		} catch (ConnectionException e) {
 			e.printStackTrace();
+		} finally {
+			close(); 
 		}
-	}
+	} 
 
 	public void fail() {
 
@@ -140,10 +143,10 @@ public class EventHubSpout extends BaseRichSpout {
 				(Filter) new SelectorFilter(
 						"amqp.annotation.x-opt-offset > '-1'"));
 		try {
-			/* receiver = amqpSession.createReceiver(consumerAddress,
-					AcknowledgeMode.AMO, "eventhub-receiver-link", false,
-					filters, null); */
-				receiver = amqpSession.createReceiver("amqps://owner:IAf%2B4iNvSMkouYVPdUPuCWjvLQlPGa04Aar14u58Hyc%3D@enterprisefitness.servicebus.windows.net/activize/ConsumerGroups/$default/Partitions/3");
+//			receiver = amqpSession.createReceiver(consumerAddress,
+//					AcknowledgeMode.AMO, "eventhub-receiver-link", false,
+//					filters, null);
+			receiver = amqpSession.createReceiver("amqps://owner:IAf%2B4iNvSMkouYVPdUPuCWjvLQlPGa04Aar14u58Hyc%3D@enterprisefitness.servicebus.windows.net/activize/ConsumerGroups/$default/Partitions/3");
 			
 			receiver.setCredit(UnsignedInteger.valueOf(10), true);
 		} catch (ConnectionErrorException e) {
@@ -173,8 +176,14 @@ public class EventHubSpout extends BaseRichSpout {
 	}
 
 	public void close() {
-		receiver.close();
-		amqpSession.close();
+		if (receiver != null) {
+			receiver.close();
+		}
+		
+		if (amqpSession != null) {
+			amqpSession.close();
+		}
+		
 		try {
 			amqpConnection.close();
 		} catch (ConnectionErrorException e) {
