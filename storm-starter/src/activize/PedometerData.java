@@ -15,6 +15,23 @@ public class PedometerData {
 	private double deltaRunStep;
 	private double deltaTotalStep;
 	private double deltaWalkStep;
+	
+	public PedometerData(String deviceId, String companyId, String date, String time) {
+		this.deviceId = deviceId; 
+		this.companyId = companyId; 
+		this.date = date; 
+		this.time = time; 
+		this.calorie = 0; 
+		this.distance = 0; 
+		this.runStep = 0; 
+		this.totalStep = 0;
+		this.walkStep = 0; 
+		this.deltaCalorie = 0; 
+		this.deltaDistance = 0; 
+		this.deltaRunStep = 0; 
+		this.deltaTotalStep = 0;
+		this.deltaWalkStep = 0; 
+	}
 
 	public String getDeviceId() {
 		return deviceId;

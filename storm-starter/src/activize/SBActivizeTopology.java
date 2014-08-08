@@ -10,14 +10,15 @@ import activize.bolt.MessageReceiverBolt;
 import activize.bolt.DBWriterBolt;
 import activize.bolt.RawDatabaseBolt;
 import activize.bolt.UserAggregatorBolt;
-import activize.spout.EventHubSpout;
-
+import activize.spout.ServiceBusQueueConnection;
+import activize.spout.ServiceBusQueueSpout;
+import activize.spout.interfaces.IServiceBusQueueDetail;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
-public class ActivizeTopology {
+public class SBActivizeTopology {
 
 	public static void main(String[] args) throws Exception {
 
@@ -29,30 +30,32 @@ public class ActivizeTopology {
 			e.printStackTrace();
 		}
 
-		String spoutId = "EHSpout";
-		String connectionUri = prop.getProperty("URI");
-		String consumerGroup = prop.getProperty("CONSUMER");
+		String connectionString = prop.getProperty("SB_CONNECTION");
+		String queueName = prop.getProperty("SB_QUEUE");
+		String sbSpoutId = "SBSpout";
 
+		IServiceBusQueueDetail connection = new ServiceBusQueueConnection(
+				connectionString, queueName);
 		TopologyBuilder builder = new TopologyBuilder();
 
 		// sets spout, connects to ServiceBus Queue
-		builder.setSpout(spoutId, new EventHubSpout(connectionUri, consumerGroup), 1); 
+		builder.setSpout(sbSpoutId, new ServiceBusQueueSpout(connection), 8);
 
 		// sets bolts
 		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 8)
-				.shuffleGrouping(spoutId);
+				.shuffleGrouping(sbSpoutId);
 
-//		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
-//				.shuffleGrouping("MessageReceiverBolt");
 		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
 
-//		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
-//				.shuffleGrouping("UserAggregatorBolt");
-//		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)
-//				.shuffleGrouping("CompanyAggregatorBolt");
+		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
+				.shuffleGrouping("MessageReceiverBolt");
+		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
+				.shuffleGrouping("UserAggregatorBolt");
+		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)
+				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);
