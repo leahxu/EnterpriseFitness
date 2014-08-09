@@ -1,8 +1,6 @@
 package activize.bolt;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -32,7 +30,7 @@ public class MessageReceiverBolt extends BaseBasicBolt {
 //			cleanInput = matcher.group(1);
 //		}
 
-		//System.out.println(cleanInput);
+		System.out.println(input);
 
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -50,7 +48,6 @@ public class MessageReceiverBolt extends BaseBasicBolt {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override

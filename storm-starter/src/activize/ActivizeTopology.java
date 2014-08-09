@@ -42,17 +42,17 @@ public class ActivizeTopology {
 		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 8)
 				.shuffleGrouping(spoutId);
 
-//		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
-//				.shuffleGrouping("MessageReceiverBolt");
+		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
+				.shuffleGrouping("MessageReceiverBolt");
 		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
 				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
 
-//		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
-//				.shuffleGrouping("UserAggregatorBolt");
-//		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)
-//				.shuffleGrouping("CompanyAggregatorBolt");
+		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
+				.shuffleGrouping("UserAggregatorBolt");
+		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)
+				.shuffleGrouping("CompanyAggregatorBolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);

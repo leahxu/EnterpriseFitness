@@ -52,10 +52,10 @@ public class EventHubSender implements MessageListener {
     private void sendMessage(String input) throws JMSException {
         TextMessage message = sendSession.createTextMessage();
         message.setText(input);
-        long randomMessageID = randomGenerator.nextLong() >>>1;
+        long randomMessageID = randomGenerator.nextLong() >>> 1;
         message.setJMSMessageID("ID:" + randomMessageID);
         sender.send(message);
-        System.out.println("Sent message with JMSMessageID = " + message.getText());
+        System.out.println("Sent = " + message.getText());
     }
 
     public void close() throws JMSException {

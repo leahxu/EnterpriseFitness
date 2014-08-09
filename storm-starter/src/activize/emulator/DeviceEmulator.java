@@ -12,8 +12,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class DeviceEmulator {
 
 	protected ArrayList<String> mockPedometer;
-	final static int DEVICES = 4;
-	final static int HOURS = 1;
+	final static int DEVICES = 40;
+	final static int HOURS = 2;
 
 	public void createDevices() {
 		mockPedometer = new ArrayList<String>();

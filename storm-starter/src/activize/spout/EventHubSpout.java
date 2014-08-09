@@ -34,9 +34,6 @@ import backtype.storm.tuple.Values;
 
 @SuppressWarnings("serial")
 public class EventHubSpout extends BaseRichSpout {
-	//final static String connectionUri = "amqps://owner:IAf%2B4iNvSMkouYVPdUPuCWjvLQlPGa04Aar14u58Hyc%3D@enterprisefitness.servicebus.windows.net?sync-publish=true&max-sessions=10000";
-	//final static String consumerAddress = "activize/ConsumerGroups/$default/Partitions/1";
-
 	public static final String CONFIG_PREFETCH_COUNT = "amqp.prefetch.count";
 	private static final long DEFAULT_PREFETCH_COUNT = 100;
 
@@ -55,7 +52,7 @@ public class EventHubSpout extends BaseRichSpout {
 
 	private String connectionUri;
 	private String consumerAddress;
-	
+
 	private String amqpHost;
 	private int amqpPort;
 	private String amqpUsername;
@@ -69,7 +66,7 @@ public class EventHubSpout extends BaseRichSpout {
 
 	public EventHubSpout(String connectionUri, String consumerAddress) {
 		this.connectionUri = connectionUri;
-		this.consumerAddress = consumerAddress; 
+		this.consumerAddress = consumerAddress;
 		this.amqpHost = null;
 		this.amqpPort = -1;
 		this.amqpUsername = null;
@@ -90,83 +87,76 @@ public class EventHubSpout extends BaseRichSpout {
 					+ " must be at least 1");
 		}
 
+		URL url = null;
 		try {
-			URL url = new URL(null, connectionUri, new URLStreamHandler() {
+			url = new URL(null, connectionUri, new URLStreamHandler() {
 				@Override
 				protected URLConnection openConnection(URL u)
 						throws IOException {
 					throw new UnsupportedOperationException();
 				}
 			});
-			
-			String protocol = url.getProtocol();
-			boolean ssl = "amqps".equals(protocol);
-			amqpHost = url.getHost();
-			amqpPort = url.getPort();
-			
-			if (amqpPort == -1)
-				amqpPort = ssl ? 5671 : 5672;
-			
-			String userInfo = url.getUserInfo();
-			amqpUsername = null;
-			amqpPassword = null;
-			
-			if (userInfo != null) {
-				String[] creds = userInfo.split(":", 2);
-				amqpUsername = URLDecoder.decode(creds[0]);
-				amqpPassword = URLDecoder.decode(creds[1]);
-			}
-			
-			amqpConnection = new Connection(amqpHost, amqpPort, amqpUsername,
-					amqpPassword, amqpHost, ssl);
-			System.out.println(amqpConnection.toString());
-			SelectorFilterWriter.register(amqpConnection.getEndpoint()
-					.getDescribedTypeRegistry());
-			amqpSession = amqpConnection.createSession();
-			System.out.println(amqpSession.toString());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+		}
+
+		String protocol = url.getProtocol();
+		boolean ssl = "amqps".equals(protocol);
+		amqpHost = url.getHost();
+		amqpPort = url.getPort();
+		if (amqpPort == -1)
+			amqpPort = ssl ? 5671 : 5672;
+		String userInfo = url.getUserInfo();
+		amqpUsername = null;
+		amqpPassword = null;
+		if (userInfo != null) {
+			String[] creds = userInfo.split(":", 2);
+			amqpUsername = URLDecoder.decode(creds[0]);
+			amqpPassword = URLDecoder.decode(creds[1]);
+		}
+
+		try {
+			amqpConnection = new Connection(amqpHost, amqpPort, amqpUsername,
+					amqpPassword, amqpHost, ssl);
 		} catch (ConnectionException e) {
 			e.printStackTrace();
-		} finally {
-			close(); 
 		}
-	} 
+		SelectorFilterWriter.register(amqpConnection.getEndpoint()
+				.getDescribedTypeRegistry());
+
+		try {
+			amqpSession = amqpConnection.createSession();
+		} catch (ConnectionException e) {
+			e.printStackTrace();
+		}
+
+		Map<Symbol, Filter> filters = Collections.singletonMap(Symbol
+				.valueOf("apache.org:selector-filter:string"),
+				(Filter) new SelectorFilter(
+						"amqp.annotation.x-opt-offset > '-1'"));
+
+		try {
+			receiver = amqpSession.createReceiver(consumerAddress,
+					AcknowledgeMode.AMO, "eventhub-receiver-link", false,
+					filters, null);
+		} catch (ConnectionErrorException e) {
+			e.printStackTrace();
+		}
+		receiver.setCredit(UnsignedInteger.valueOf(10), true);
+	}
 
 	public void fail() {
 
 	}
 
 	public void nextTuple() {
-		Map<Symbol, Filter> filters = Collections.singletonMap(Symbol
-				.valueOf("apache.org:selector-filter:string"),
-				(Filter) new SelectorFilter(
-						"amqp.annotation.x-opt-offset > '-1'"));
-		try {
-//			receiver = amqpSession.createReceiver(consumerAddress,
-//					AcknowledgeMode.AMO, "eventhub-receiver-link", false,
-//					filters, null);
-			receiver = amqpSession.createReceiver("amqps://owner:IAf%2B4iNvSMkouYVPdUPuCWjvLQlPGa04Aar14u58Hyc%3D@enterprisefitness.servicebus.windows.net/activize/ConsumerGroups/$default/Partitions/3");
-			
-			receiver.setCredit(UnsignedInteger.valueOf(10), true);
-		} catch (ConnectionErrorException e) {
-			e.printStackTrace();
-		}
+		Message message = receiver.receive();
+		if (message != null) {
+			AmqpValue val = null;
 
-		Message message;
-
-		while (true) {
-			message = receiver.receive(60000);
-			if (message == null) {
-				break;
-			}
-
-			AmqpValue val = null; 
-
-			for (Section s : message.getPayload()) {
-				
-				if (s instanceof AmqpValue) {
-					val = (AmqpValue) s; 
+			for (Section section : message.getPayload()) {
+				if (section instanceof AmqpValue) {
+					val = (AmqpValue) section;
 				}
 			}
 
@@ -176,14 +166,8 @@ public class EventHubSpout extends BaseRichSpout {
 	}
 
 	public void close() {
-		if (receiver != null) {
-			receiver.close();
-		}
-		
-		if (amqpSession != null) {
-			amqpSession.close();
-		}
-		
+		receiver.close();
+		amqpSession.close();
 		try {
 			amqpConnection.close();
 		} catch (ConnectionErrorException e) {
