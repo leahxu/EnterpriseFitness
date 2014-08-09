@@ -54,9 +54,9 @@ public class DeviceEmulator {
 						currDate, currTime);
 
 				instance.setDeltaCalorie(random.nextDouble() * 100);
-				instance.setDeltaDistance(random.nextDouble() * .5);
-				instance.setDeltaRunStep(random.nextInt() * 300);
-				instance.setDeltaWalkStep(random.nextInt() * 200);
+				instance.setDeltaDistance(random.nextDouble() * 1);
+				instance.setDeltaRunStep((int) (random.nextDouble()*200));
+				instance.setDeltaWalkStep((int) (random.nextDouble()*300));
 				instance.setDeltaTotalStep(instance.getDeltaWalkStep()
 						+ instance.getDeltaTotalStep());
 
