@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 import activize.bolt.CompanyAggregatorBolt;
-import activize.bolt.MessageReceiverBolt;
+import activize.bolt.SBMessageReceiverBolt;
 import activize.bolt.DBWriterBolt;
 import activize.bolt.RawDatabaseBolt;
 import activize.bolt.UserAggregatorBolt;
@@ -42,16 +42,16 @@ public class SBActivizeTopology {
 		builder.setSpout(sbSpoutId, new ServiceBusQueueSpout(connection), 8);
 
 		// sets bolts
-		builder.setBolt("MessageReceiverBolt", new MessageReceiverBolt(), 8)
+		builder.setBolt("SBMessageReceiverBolt", new SBMessageReceiverBolt(), 8)
 				.shuffleGrouping(sbSpoutId);
 
 		builder.setBolt("UserAggregatorBolt", new UserAggregatorBolt(), 8)
-				.fieldsGrouping("MessageReceiverBolt", new Fields("deviceId"));
+				.fieldsGrouping("SBMessageReceiverBolt", new Fields("deviceId"));
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
-				.fieldsGrouping("MessageReceiverBolt", new Fields("companyId"));
+				.fieldsGrouping("SBMessageReceiverBolt", new Fields("companyId"));
 
 		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
-				.shuffleGrouping("MessageReceiverBolt");
+				.shuffleGrouping("SBMessageReceiverBolt");
 		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
 				.shuffleGrouping("UserAggregatorBolt");
 		builder.setBolt("CompanyRTDatabaseBolt", new DBWriterBolt(), 8)

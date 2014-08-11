@@ -16,7 +16,8 @@ import java.io.StringWriter;
 
 public class ServiceBusQueueConnection implements IServiceBusQueueDetail, Serializable {
 
-    private String connectionString;
+	private static final long serialVersionUID = 1L;
+	private String connectionString;
     private String queueName;
     private Integer messageCount;
     private ServiceBusContract serviceBusContract = null;
@@ -61,6 +62,7 @@ public class ServiceBusQueueConnection implements IServiceBusQueueDetail, Serial
         try
         {
             CreateQueueResult result = serviceBusContract.createQueue(queueInfo);
+            
             // chances are if this fails we'll be looking at the queue already existing
             isConnected = true;
             logger.info("connected to service bus queue " + this.getQueueName());

@@ -16,7 +16,7 @@
 		<artifactId>storm</artifactId>
 		<groupId>org.apache.storm</groupId>
 		<version>0.9.3-incubating-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<!-- <relativePath>../../pom.xml</relativePath> -->
 	</parent>
 
 	<artifactId>activize</artifactId>

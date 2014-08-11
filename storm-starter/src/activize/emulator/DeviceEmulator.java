@@ -13,7 +13,7 @@ public class DeviceEmulator {
 
 	protected ArrayList<String> mockPedometer;
 	final static int DEVICES = 40;
-	final static int HOURS = 2;
+	final static int HOURS = 720;
 
 	public void createDevices() {
 		mockPedometer = new ArrayList<String>();
@@ -32,16 +32,16 @@ public class DeviceEmulator {
 		}
 
 		Calendar prev = Calendar.getInstance();
-		prev.set(2014, 7, 5, 23, 0, 0);
+		prev.set(2014, 7, 11, 23, 0, 0);
 
 		// Time
 		for (int i = 0; i < HOURS; i++) {
 			Calendar curr = prev;
-			curr.add(Calendar.HOUR, 1);
+			curr.add(Calendar.HOUR_OF_DAY, 1);
 
 			String currDate = curr.get(Calendar.MONTH) + "/"
 					+ curr.get(Calendar.DATE) + "/" + curr.get(Calendar.YEAR);
-			String currTime = curr.get(Calendar.HOUR) + ":"
+			String currTime = curr.get(Calendar.HOUR_OF_DAY) + ":"
 					+ curr.get(Calendar.MINUTE) + ":"
 					+ curr.get(Calendar.SECOND);
 
@@ -50,15 +50,14 @@ public class DeviceEmulator {
 				String deviceId = "DEVICE" + j;
 				String companyId = companies[j % companies.length];
 
-				PedometerData instance = new PedometerData(deviceId, companyId,
-						currDate, currTime);
+				PedometerData instance = new PedometerData(deviceId, companyId, currDate, currTime);
 
-				instance.setDeltaCalorie(random.nextDouble() * 100);
-				instance.setDeltaDistance(random.nextDouble() * 1);
-				instance.setDeltaRunStep((int) (random.nextDouble()*200));
-				instance.setDeltaWalkStep((int) (random.nextDouble()*300));
+				instance.setDeltaCalorie(random.nextDouble() * 100.0);
+				instance.setDeltaDistance(random.nextDouble() * 1.0);
+				instance.setDeltaRunStep((int) (random.nextDouble() * 200.0));
+				instance.setDeltaWalkStep((int) (random.nextDouble() * 300.0));
 				instance.setDeltaTotalStep(instance.getDeltaWalkStep()
-						+ instance.getDeltaTotalStep());
+						+ instance.getDeltaRunStep());
 
 				if (prev.get(Calendar.DATE) == curr.get(Calendar.DATE)) {
 					devices[j].calorie += instance.getDeltaCalorie();
@@ -81,7 +80,8 @@ public class DeviceEmulator {
 				instance.setTotalStep(devices[j].totalStep);
 
 				try {
-					String serialized = new ObjectMapper().writeValueAsString(instance);
+					String serialized = new ObjectMapper()
+							.writeValueAsString(instance);
 					mockPedometer.add(serialized);
 				} catch (JsonGenerationException e) {
 					e.printStackTrace();
@@ -89,7 +89,7 @@ public class DeviceEmulator {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
-				} 
+				}
 			}
 
 			prev = curr;
