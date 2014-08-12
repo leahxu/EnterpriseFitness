@@ -13,7 +13,7 @@ public class DeviceEmulator {
 
 	protected ArrayList<String> mockPedometer;
 	final static int DEVICES = 40;
-	final static int HOURS = 720;
+	final static int HOURS = 750;
 
 	public void createDevices() {
 		mockPedometer = new ArrayList<String>();
@@ -32,11 +32,14 @@ public class DeviceEmulator {
 		}
 
 		Calendar prev = Calendar.getInstance();
-		prev.set(2014, 7, 11, 23, 0, 0);
+		prev.set(2014, 7, 12, 0, 0, 0);
 
 		// Time
 		for (int i = 0; i < HOURS; i++) {
-			Calendar curr = prev;
+			Calendar curr = Calendar.getInstance();
+			curr.set(prev.get(Calendar.YEAR), prev.get(Calendar.MONTH),
+					prev.get(Calendar.DATE), prev.get(Calendar.HOUR_OF_DAY),
+					prev.get(Calendar.MINUTE), prev.get(Calendar.SECOND));
 			curr.add(Calendar.HOUR_OF_DAY, 1);
 
 			String currDate = curr.get(Calendar.MONTH) + "/"
@@ -50,7 +53,8 @@ public class DeviceEmulator {
 				String deviceId = "DEVICE" + j;
 				String companyId = companies[j % companies.length];
 
-				PedometerData instance = new PedometerData(deviceId, companyId, currDate, currTime);
+				PedometerData instance = new PedometerData(deviceId, companyId,
+						currDate, currTime);
 
 				instance.setDeltaCalorie(random.nextDouble() * 100.0);
 				instance.setDeltaDistance(random.nextDouble() * 1.0);

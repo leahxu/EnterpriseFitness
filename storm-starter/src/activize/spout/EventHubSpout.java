@@ -136,6 +136,7 @@ public class EventHubSpout extends BaseRichSpout {
 						"amqp.annotation.x-opt-offset > '-1'"));
 
 		try {
+			System.out.println(consumerAddress);
 			receiver = amqpSession.createReceiver(consumerAddress,
 					AcknowledgeMode.AMO, "eventhub-receiver-link", false,
 					filters, null);

@@ -24,7 +24,7 @@ public class SBActivizeTopology {
 
 		Properties prop = new Properties();
 		try {
-			prop.load(ActivizeTopology.class.getClassLoader()
+			prop.load(EHActivizeTopology.class.getClassLoader()
 					.getResourceAsStream("config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();

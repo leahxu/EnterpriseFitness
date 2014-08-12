@@ -17,13 +17,13 @@ import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
-public class ActivizeTopology {
+public class EHActivizeTopology {
 
 	public static void main(String[] args) throws Exception {
 
 		Properties prop = new Properties();
 		try {
-			prop.load(ActivizeTopology.class.getClassLoader()
+			prop.load(EHActivizeTopology.class.getClassLoader()
 					.getResourceAsStream("config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
