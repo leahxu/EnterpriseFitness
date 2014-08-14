@@ -1,5 +1,4 @@
 *.class
-config.properties
 
 # Output files
 *.out
