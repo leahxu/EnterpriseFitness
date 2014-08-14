@@ -1,19 +1,27 @@
 package activize.emulator;
 
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import java.util.Hashtable;
 import java.util.Random;
 
-public class EventHubSender implements MessageListener {
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+public class ServiceBusSender implements MessageListener {
     private Connection connection;
     private Session sendSession;
     private MessageProducer sender;
     private static Random randomGenerator = new Random();
 
-    public EventHubSender() throws Exception {
+    public ServiceBusSender() throws Exception {
         // Configure JNDI environment
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, 
@@ -22,8 +30,8 @@ public class EventHubSender implements MessageListener {
         Context context = new InitialContext(env);
 
         // Lookup ConnectionFactory and Queue
-        ConnectionFactory cf = (ConnectionFactory) context.lookup("EHPublisher");
-        Destination queue = (Destination) context.lookup("EHSend");
+        ConnectionFactory cf = (ConnectionFactory) context.lookup("SBCF");
+        Destination queue = (Destination) context.lookup("SBQUEUE");
 
         // Create Connection
         connection = cf.createConnection();
@@ -33,17 +41,17 @@ public class EventHubSender implements MessageListener {
         sender = sendSession.createProducer(queue);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         try {
-            EventHubSender sender = new EventHubSender();
+        	ServiceBusSender simpleSenderReceiver = new ServiceBusSender();
             DeviceEmulator emulator = new DeviceEmulator(); 
             emulator.createDevices(); 
             
             for (String device : emulator.mockPedometer) {
-            	sender.sendMessage(device);
+            	simpleSenderReceiver.sendMessage(device);
             }
             
-            sender.close();
+            simpleSenderReceiver.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,7 +60,7 @@ public class EventHubSender implements MessageListener {
     private void sendMessage(String input) throws JMSException {
         TextMessage message = sendSession.createTextMessage();
         message.setText(input);
-        long randomMessageID = randomGenerator.nextLong() >>> 1;
+        long randomMessageID = randomGenerator.nextLong() >>>1;
         message.setJMSMessageID("ID:" + randomMessageID);
         sender.send(message);
         System.out.println("Sent = " + message.getText());
@@ -62,7 +70,7 @@ public class EventHubSender implements MessageListener {
         connection.close();
     }
 
-	@Override
+    @Override
 	public void onMessage(Message message) {
 		// Do nothing
 	}

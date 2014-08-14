@@ -13,7 +13,7 @@ public class DeviceEmulator {
 
 	protected ArrayList<String> mockPedometer;
 	final static int DEVICES = 40;
-	final static int HOURS = 750;
+	final static int HOURS = 5;
 
 	public void createDevices() {
 		mockPedometer = new ArrayList<String>();
@@ -32,7 +32,7 @@ public class DeviceEmulator {
 		}
 
 		Calendar prev = Calendar.getInstance();
-		prev.set(2014, 7, 12, 0, 0, 0);
+		prev.set(2014, 8, 12, 21, 0, 0);
 
 		// Time
 		for (int i = 0; i < HOURS; i++) {
@@ -50,7 +50,7 @@ public class DeviceEmulator {
 
 			// PedometerData Instance
 			for (int j = 0; j < DEVICES; j++) {
-				String deviceId = "DEVICE" + j;
+				String deviceId = "TRIAL" + j;
 				String companyId = companies[j % companies.length];
 
 				PedometerData instance = new PedometerData(deviceId, companyId,

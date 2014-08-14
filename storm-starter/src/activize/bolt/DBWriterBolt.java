@@ -6,20 +6,29 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.Properties;
 
-import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class DBWriterBolt extends BaseBasicBolt {
+public class DBWriterBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
+	private OutputCollector _collector;
 
 	@Override
-	public void execute(Tuple tuple, BasicOutputCollector collector) {
+	public void prepare(Map conf, TopologyContext context,
+			OutputCollector collector) {
+		_collector = collector;
+	}
+
+	@Override
+	public void execute(Tuple tuple) {
 		String table = tuple.getString(0);
 		String deviceId = tuple.getString(1);
 		String companyId = tuple.getString(2);
@@ -60,7 +69,8 @@ public class DBWriterBolt extends BaseBasicBolt {
 			System.out.println("ERROR: This is not a valid table name!");
 		}
 
-		collector.emit(new Values("Done"));
+		_collector.emit(new Values("Done"));
+		_collector.ack(tuple);
 	}
 
 	@Override
@@ -95,14 +105,13 @@ public class DBWriterBolt extends BaseBasicBolt {
 
 			// Execute the statement.
 			resultSet = statement.executeQuery(sqlQuery);
-
 		}
 		// Exception handling
 		catch (ClassNotFoundException cnfe) {
-			System.out.println("ClassNotFoundException " + cnfe.getMessage());
+			System.out.println("ClassNotFoundException: " + cnfe.getMessage());
 		} catch (Exception e) {
-			System.out.println("Exception " + e.getMessage());
-			e.printStackTrace();
+			System.out.println(e.getMessage());
+			//e.printStackTrace();
 		} finally {
 			try {
 				// Close resources.
@@ -113,7 +122,6 @@ public class DBWriterBolt extends BaseBasicBolt {
 				if (null != resultSet) {
 					resultSet.close();
 				}
-
 			} catch (SQLException sqlException) {
 				// No additional action if close() statements fail.
 			}

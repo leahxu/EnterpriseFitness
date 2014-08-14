@@ -147,7 +147,7 @@ public class EventHubSpout extends BaseRichSpout {
 	}
 
 	public void fail() {
-
+		//TODO Implement fail
 	}
 
 	public void nextTuple() {

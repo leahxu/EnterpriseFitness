@@ -1,20 +1,28 @@
 package activize.bolt;
 
 import java.util.Hashtable;
+import java.util.Map;
 
-import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class CompanyAggregatorBolt extends BaseBasicBolt {
+public class CompanyAggregatorBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
-	private static Hashtable<String, Hashtable<String, Double>> companyData = new Hashtable<String, Hashtable<String, Double>>();
+	private static Hashtable<String, Hashtable<String, Double>> _companyData = new Hashtable<String, Hashtable<String, Double>>();
+	private OutputCollector _collector; 
+	
+	@Override
+	public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+		_collector = collector; 
+	}
 
 	@Override
-	public void execute(Tuple tuple, BasicOutputCollector collector) {
+	public void execute(Tuple tuple) {
 		String deviceId = tuple.getString(0);
 		String companyId = tuple.getString(1);
 		String date = tuple.getString(2);
@@ -31,42 +39,45 @@ public class CompanyAggregatorBolt extends BaseBasicBolt {
 		String stringDate = splitDate[0] + splitDate[1] + splitDate[2];
 		double doubleDate = Double.parseDouble(stringDate);
 
-		if (!companyData.containsKey(companyId)) {
-			companyData.put(companyId, new Hashtable<String, Double>());
-			companyData.get(companyId).put("date", doubleDate);
-			companyData.get(companyId).put("calorie", deltaCalorie);
-			companyData.get(companyId).put("distance", deltaDistance);
-			companyData.get(companyId).put("runStep", deltaRunStep);
-			companyData.get(companyId).put("totalStep", deltaTotalStep);
-			companyData.get(companyId).put("walkStep", deltaWalkStep);
-		} else if (companyData.get(companyId).get("date") != doubleDate) {
-			companyData.get(companyId).put("date", doubleDate);
-			companyData.get(companyId).put("calorie", deltaCalorie);
-			companyData.get(companyId).put("distance", deltaDistance);
-			companyData.get(companyId).put("runStep", deltaRunStep);
-			companyData.get(companyId).put("totalStep", deltaTotalStep);
-			companyData.get(companyId).put("walkStep", deltaWalkStep);
+		if (!_companyData.containsKey(companyId)) {
+			_companyData.put(companyId, new Hashtable<String, Double>());
+			_companyData.get(companyId).put("date", doubleDate);
+			_companyData.get(companyId).put("calorie", deltaCalorie);
+			_companyData.get(companyId).put("distance", deltaDistance);
+			_companyData.get(companyId).put("runStep", deltaRunStep);
+			_companyData.get(companyId).put("totalStep", deltaTotalStep);
+			_companyData.get(companyId).put("walkStep", deltaWalkStep);
+		} else if (_companyData.get(companyId).get("date") != doubleDate) {
+			_companyData.get(companyId).put("date", doubleDate);
+			_companyData.get(companyId).put("calorie", deltaCalorie);
+			_companyData.get(companyId).put("distance", deltaDistance);
+			_companyData.get(companyId).put("runStep", deltaRunStep);
+			_companyData.get(companyId).put("totalStep", deltaTotalStep);
+			_companyData.get(companyId).put("walkStep", deltaWalkStep);
 		} else {
-			companyData.get(companyId).put("calorie",
-					companyData.get(companyId).get("calorie") + deltaCalorie);
-			companyData.get(companyId).put("distance",
-					companyData.get(companyId).get("distance") + deltaDistance);
-			companyData.get(companyId).put("runStep",
-					companyData.get(companyId).get("runStep") + deltaRunStep);
-			companyData.get(companyId).put("totalStep",
-					companyData.get(companyId).get("totalStep") + deltaTotalStep);
-			companyData.get(companyId).put("walkStep",
-					companyData.get(companyId).get("walkStep") + deltaWalkStep);
+			_companyData.get(companyId).put("calorie",
+					_companyData.get(companyId).get("calorie") + deltaCalorie);
+			_companyData.get(companyId).put("distance",
+					_companyData.get(companyId).get("distance") + deltaDistance);
+			_companyData.get(companyId).put("runStep",
+					_companyData.get(companyId).get("runStep") + deltaRunStep);
+			_companyData.get(companyId).put("totalStep",
+					_companyData.get(companyId).get("totalStep") + deltaTotalStep);
+			_companyData.get(companyId).put("walkStep",
+					_companyData.get(companyId).get("walkStep") + deltaWalkStep);
 		}
 
-		collector.emit(new Values("Company", deviceId, companyId, date, time,
-				companyData.get(companyId).get("calorie"), companyData.get(
-						companyId).get("distance"), companyData.get(companyId)
-						.get("runStep"), companyData.get(companyId).get(
-						"totalStep"), companyData.get(companyId)
+		_collector.emit(new Values("Company", deviceId, companyId, date, time,
+				_companyData.get(companyId).get("calorie"), _companyData.get(
+						companyId).get("distance"), _companyData.get(companyId)
+						.get("runStep"), _companyData.get(companyId).get(
+						"totalStep"), _companyData.get(companyId)
 						.get("walkStep")));
+		
+		_collector.ack(tuple);
+		
 	}
-
+	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("table", "deviceId", "companyId", "date",

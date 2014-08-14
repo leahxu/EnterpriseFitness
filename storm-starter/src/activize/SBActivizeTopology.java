@@ -8,7 +8,7 @@ import java.util.Properties;
 import activize.bolt.CompanyAggregatorBolt;
 import activize.bolt.SBMessageReceiverBolt;
 import activize.bolt.DBWriterBolt;
-import activize.bolt.RawDatabaseBolt;
+import activize.bolt.RawDBWriterBolt;
 import activize.bolt.UserAggregatorBolt;
 import activize.spout.ServiceBusQueueConnection;
 import activize.spout.ServiceBusQueueSpout;
@@ -50,7 +50,7 @@ public class SBActivizeTopology {
 		builder.setBolt("CompanyAggregatorBolt", new CompanyAggregatorBolt(), 8)
 				.fieldsGrouping("SBMessageReceiverBolt", new Fields("companyId"));
 
-		builder.setBolt("RawDBWriterBolt", new RawDatabaseBolt(), 8)
+		builder.setBolt("RawDBWriterBolt", new RawDBWriterBolt(), 8)
 				.shuffleGrouping("SBMessageReceiverBolt");
 		builder.setBolt("UserRTDatabaseBolt", new DBWriterBolt(), 8)
 				.shuffleGrouping("UserAggregatorBolt");
