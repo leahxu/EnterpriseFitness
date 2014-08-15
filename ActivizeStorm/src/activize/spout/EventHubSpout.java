@@ -37,17 +37,12 @@ public class EventHubSpout extends BaseRichSpout {
 	public static final String CONFIG_PREFETCH_COUNT = "amqp.prefetch.count";
 	private static final long DEFAULT_PREFETCH_COUNT = 100;
 
-	/**
-	 * Time in milliseconds to wait for a message from the queue if there is no
-	 * message ready when the topology requests a tuple (via
-	 * {@link #nextTuple()}).
-	 */
+	// Time in milliseconds to wait for a message from the queue if there is no
+	// message ready when the topology requests a tuple (via {@link #nextTuple()}).
 	public static final long WAIT_FOR_NEXT_MESSAGE = 1L;
 
-	/**
-	 * Time in milliseconds to wait after losing connection to the AMQP broker
-	 * before attempting to reconnect.
-	 */
+	// Time in milliseconds to wait after losing connection to the AMQP broker
+	// before attempting to reconnect.
 	public static final long WAIT_AFTER_SHUTDOWN_SIGNAL = 10000L;
 
 	private String connectionUri;
@@ -74,9 +69,7 @@ public class EventHubSpout extends BaseRichSpout {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void open(@SuppressWarnings("rawtypes") Map config,
-			TopologyContext context, SpoutOutputCollector collector) {
-		
+	public void open(Map config, TopologyContext context, SpoutOutputCollector collector) {
 		this.collector = collector;
 		Long prefetchCount = (Long) config.get(CONFIG_PREFETCH_COUNT);
 		

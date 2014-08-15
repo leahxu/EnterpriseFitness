@@ -48,6 +48,7 @@ public class CompanyAggregatorBolt extends BaseRichBolt {
 			_companyData.get(companyId).put("totalStep", deltaTotalStep);
 			_companyData.get(companyId).put("walkStep", deltaWalkStep);
 		} else if (_companyData.get(companyId).get("date") != doubleDate) {
+			// Resets metrics at the end of each day
 			_companyData.get(companyId).put("date", doubleDate);
 			_companyData.get(companyId).put("calorie", deltaCalorie);
 			_companyData.get(companyId).put("distance", deltaDistance);

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 import activize.bolt.CompanyAggregatorBolt;
-import activize.bolt.EHMessageReceiverBolt;
+import activize.bolt.MessageReceiverBolt;
 import activize.bolt.DBWriterBolt;
 import activize.bolt.RawDBWriterBolt;
 import activize.bolt.UserAggregatorBolt;
@@ -31,12 +31,13 @@ public class EHActivizeTopology {
 		String connectionUri = prop.getProperty("URI");
 		TopologyBuilder builder = new TopologyBuilder();
 
+		// Each spout connects to an Event Hubs partition
 		for (int i = 0; i < 8; i++) {
 			builder.setSpout("EHSpout" + i, new EventHubSpout(connectionUri,
 					prop.getProperty("CONSUMER" + i)), 1);
 
 			builder.setBolt("MessageReceiverBolt" + i,
-					new EHMessageReceiverBolt(), 1)
+					new MessageReceiverBolt(), 1)
 					.shuffleGrouping("EHSpout" + i);
 			builder.setBolt("RawDBWriterBolt" + i, new RawDBWriterBolt(), 8)
 					.shuffleGrouping("MessageReceiverBolt" + i);

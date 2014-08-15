@@ -64,6 +64,7 @@ public class DeviceEmulator {
 						+ instance.getDeltaRunStep());
 
 				if (prev.get(Calendar.DATE) == curr.get(Calendar.DATE)) {
+					// Resets each metric at the end of each day
 					devices[j].calorie += instance.getDeltaCalorie();
 					devices[j].distance += instance.getDeltaDistance();
 					devices[j].runStep += instance.getDeltaRunStep();

@@ -16,7 +16,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class EHMessageReceiverBolt extends BaseRichBolt {
+public class MessageReceiverBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector _collector;
 
@@ -35,6 +35,7 @@ public class EHMessageReceiverBolt extends BaseRichBolt {
 		input = input.substring(0, input.length() - 1);
 
 		try {
+			// deserialize JSON string
 			ObjectMapper mapper = new ObjectMapper();
 			PedometerData data = mapper.readValue(input, PedometerData.class);
 			
