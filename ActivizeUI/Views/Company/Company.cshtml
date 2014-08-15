@@ -1,0 +1,85 @@
+﻿@using System.Timers
+@using Bootstrap.Controllers
+@using Bootstrap.Models
+@using Microsoft.AspNet.Identity
+@using System;
+@using Timer = System.Timers.Timer
+
+@{
+    string user = User.Identity.GetUserName();
+    string company = CompanyController.setCompanyID(User.Identity.GetUserName());
+    CompanyController.setTeamNumber();
+    ViewBag.Title = "Team";
+    ViewBag.Message = "Team Averages";
+    string teamNumber;
+    if (CompanyController.hasTeam)
+    {
+        teamNumber = "" + CompanyController.currentTeamNumber;
+    }
+    else
+    {
+        teamNumber = "no";
+    }
+
+    string run = CompanyController.queryCompanyByField(user, "RunStep");
+    string walk = CompanyController.queryCompanyByField(user, "WalkStep");
+    string steps = CompanyController.queryCompanyByField(user, "TotalStep");
+    string cals = CompanyController.queryCompanyByField(user, "Calories");
+    string dist = CompanyController.queryCompanyByField(user, "Distance");
+    int activityLevel = (int) (Double.Parse(steps)/100.0);
+}
+
+<h2>@company</h2>
+
+<h3>Team Activity Level: @activityLevel% with 22 team members</h3>
+
+<div class="progress progress-striped active" background-color="#22384e">
+    <div class="progress-bar" style="width: @activityLevel%;"></div>
+</div>
+
+<h3>@ViewBag.Message</h3>
+
+<div class="navbar navbar-default" id="RunSteps">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://activizeweb.cloudapp.net/Company/DailyCompanyRunSteps">Run Steps Taken: @run</a>
+    </div>
+</div>
+
+<div class="navbar navbar-lblue" id="WalkSteps">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse" background-color="#00AEDD">
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://activizeweb.cloudapp.net/Company/DailyCompanyWalkSteps">Walk Steps Taken: @walk</a>
+    </div>
+</div>
+
+<div class="navbar navbar-inverse" id="TotalSteps">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse" background-color="#00AEDD">
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://activizeweb.cloudapp.net/Company/DailyCompanyTotalSteps">Total Steps Taken: @steps</a>
+    </div>
+</div>
+
+<div class="navbar navbar-green" id="Calories">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://activizeweb.cloudapp.net/Company/DailyCompanyCalories">Calories Burned: @cals</a>
+    </div>
+</div>
+
+<div class="navbar navbar-purple" id="Distance">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://activizeweb.cloudapp.net/Company/DailyCompanyDistance">Distance (mi): @dist</a>
+    </div>
+</div>

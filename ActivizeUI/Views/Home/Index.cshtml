@@ -1,0 +1,40 @@
+﻿@using Bootstrap.Controllers
+@{
+    ViewBag.Title = "Home Page";
+    HomeController.getLeaderboard();
+}
+
+<h1> </h1>
+
+<div class="jumbotron">
+    <h1>Activize - Leaderboard</h1>
+    <table class="table table-striped table-hover">
+        <thread>
+            <tr>
+                <th>#</th>
+                <th>Team</th>
+                <th>Total Steps</th>
+                <th>Run Steps</th>
+                <th>Walk Steps</th>
+                <th>Calories Burned</th>
+                <th>Distance</th>
+            </tr>
+        </thread>
+        <tbody>
+            @{
+                for (int i = 0; i < 20; i++)
+                {
+                    <tr>
+                        <td>@(i+1)</td>
+                        <td>@HomeController.leaderboard[i, 0]</td>
+                        <td>@HomeController.leaderboard[i, 1]</td>
+                        <td>@HomeController.leaderboard[i, 2]</td>
+                        <td>@HomeController.leaderboard[i, 3]</td>
+                        <td>@HomeController.leaderboard[i, 4]</td>
+                        <td>@HomeController.leaderboard[i, 5]</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

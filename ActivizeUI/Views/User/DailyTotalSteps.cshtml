@@ -1,0 +1,14 @@
+﻿@using Bootstrap.Controllers
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Daily Total Steps";
+}
+
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<div id="userDailyTotalSteps"></div>
+
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/UserDailyTotalSteps.js"></script>
