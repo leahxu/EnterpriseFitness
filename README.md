@@ -31,9 +31,9 @@ or
 
 Authors
 -----------------
-Amna Hashmi
-Bridget Davis
-Leah Xu
+* Bridget Davis
+* Amna Hashmi
+* Leah Xu
 
 Microsoft Explorer Internship Summer 2014
 
