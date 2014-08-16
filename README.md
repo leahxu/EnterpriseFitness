@@ -1,4 +1,4 @@
-Activize: Enterprise Fitness with IOT
+﻿Activize: Enterprise Fitness with IOT
 =================
 
 Getting Started
@@ -28,6 +28,86 @@ or
 
     mvn compile exec:java -Dstorm.topology=storm.starter.EHActivizeTopology
     mvn compile exec:java -Dstorm.topology=storm.starter.SBActivizeTopology
+
+Activize Provider and Consumer
+-----------------
+
+The architecture of a Samsung wearable device is that it works in conjunction with a paired mobile host device (such as a phone or tablet), on which it depends for certain services.  The host device runs an application called the Gear Manager, which communicates with the WearableManagerService running on the Gear.  Applications intended for Gear has two parts, one of which runs on the host, called the Host-side Application. This installed application will include an application widget intended for the wearable device, called the Wearable-side widget. The Host-side application generally serves a "provider" function, while the Wearable-side widget generally serves a "consumer" function (these functions will be described in more detail later). During the installation of an Host-side application which contains a Wearable-side widget, the Gear Manager sends the Wearable-side widget to the WearableManagerService on the wearable. The WearableManagerService then installs the Wearable-side widget.
+1.	Open Tizen IDE for Wearable.
+2.	Open the Project Explorer. Open the res file, then the xml file. Accessoryservices.xml is the service contract of the connection between the device and the android host. The service Channel id in particular must be correct. 
+<resources>
+    	<application name="ActivizeConsumer" >
+        <serviceProfile
+            id="/system/activize"
+            name="activize"
+            role="consumer"
+            version="2.0" > 
+            <supportedTransports>
+                <transport type="TRANSPORT_BT" />
+            </supportedTransports>
+            <serviceChannel
+                id="104"
+                dataRate="low"
+                priority="low"
+                reliability="enable" />
+        </serviceProfile>
+    </application>
+</resources>
+3.	The actual pedometer collection and sending data to the Android host code is under the js file in main.js. Credit goes to http://denvycom.com/blog/accessing-sensor-data-on-samsung-gear-2/
+4.	Right click on ActivizeConsumer in the Project Explorer. Select BuildProject (F10). This will create an ActivizeConsumer.wgt file. Copy ActivizeConsumer.wgt.
+5.	Close Tizen IDE for Wearable. Open Eclipse.
+6.	Paste the ActivizeConsumer.wgt file in the assets file under the ActivizeProvider project.
+7.	To install the application, go to Settings, then Application manager on the Android device. Click on HelloAccessory (P) to uninstall.
+8.	Right click on the ActivizeProvider project in eclipse. Scroll down to Run As-> Android application. Make sure the Android device is connected to the computer via USB. Choose a running Android device and press ok.
+9.	From the main menu of the Gear, swipe twice to the right to Apps, and then click Activize. You must hit Connect for the connection between the device and the host to be established. As soon as you start walking, messages will be sent to the phone and up to Service Bus when pedometer values change. Fetch sends a message on command. The web app consoles all the messages being sent. Disconnect ends the connection.
+
+For more detailed notes on the host-side Android app:
+1.	The host has an analogous accessoryservices.xml file under res/xml. 
+<resources>
+
+    <application name="ActivizeProvider" >
+        <serviceProfile
+            id="/system/activize"
+            name="activize"
+            role="provider"
+            serviceImpl="microsoft.servicebus.activizeprovider.service.ActivizeProviderService"
+            version="1.0"
+            serviceLimit="ANY"
+	    	serviceTimeout="10">
+            <supportedTransports>
+                <transport type="TRANSPORT_BT" />
+            </supportedTransports>
+
+            <serviceChannel
+                id="104"
+                dataRate="low"
+                priority="low"
+                reliability= "enable">
+            </serviceChannel>   
+    </serviceProfile>
+    </application>
+
+</resources>
+
+2.	The AndroidManifest.xml file must contain these permissions: 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="com.samsung.accessory.permission.ACCESSORY_FRAMEWORK" />
+    <uses-permission android:name="com.samsung.wmanager.APP" />
+    <uses-permission android:name="com.samsung.wmanager.ENABLE_NOTIFICATION" /> 
+    <uses-permission android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY" /> 
+    <uses-permission android:name="com.samsung.WATCH_APP_TYPE.Integrated"/>
+
+        
+        <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="17" />
+        
+        <uses-permission android:name="android.permission.INTERNET" />
+
+3.	The address string for the send method in the UsingSwig class must be set.
+ 
 
 ActivizeUI
 ------------
