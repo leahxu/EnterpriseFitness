@@ -36,10 +36,10 @@ The architecture of a Samsung wearable device is that it works in conjunction wi
 
 1.	Open Tizen IDE for Wearable.
 
-2.	Open the Project Explorer. Open the res file, then the xml file. Accessoryservices.xml is the service contract of the connection between the device and the android host. The service Channel id in particular must be correct.
+2.	Open the Project Explorer. Open the res folder, then the xml folder. Accessoryservices.xml is the service contract of the connection between the device and the android host. The service Channel id in particular must be correct.
 
 
-3.	The actual pedometer collection and sending data to the Android host code is under the js file in main.js. Credit goes to http://denvycom.com/blog/accessing-sensor-data-on-samsung-gear-2/
+3.	The actual pedometer collection and sending data to the Android host code is under the js folder in main.js. Credit goes to http://denvycom.com/blog/accessing-sensor-data-on-samsung-gear-2/
 
 
 4.	Right click on ActivizeConsumer in the Project Explorer. Select BuildProject (F10). This will create an ActivizeConsumer.wgt file. Copy ActivizeConsumer.wgt.
@@ -48,7 +48,7 @@ The architecture of a Samsung wearable device is that it works in conjunction wi
 5.	Close Tizen IDE for Wearable. Open Eclipse.
 
 
-6.	Paste the ActivizeConsumer.wgt file in the assets file under the ActivizeProvider project.
+6.	Paste the ActivizeConsumer.wgt file in the assets folder under the ActivizeProvider project.
 
 
 7.	To install the application, go to Settings, then Application manager on the Android device. Click on HelloAccessory (P) to uninstall.
