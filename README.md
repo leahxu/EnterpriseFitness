@@ -57,7 +57,8 @@ The architecture of a Samsung wearable device is that it works in conjunction wi
 8.	Right click on the ActivizeProvider project in eclipse. Scroll down to Run As-> Android application. Make sure the Android device is connected to the computer via USB. Choose a running Android device and press ok.
 
 
-9.	From the main menu of the Gear, swipe twice to the right to Apps, and then click Activize. You must hit Connect for the connection between the device and the host to be established. As soon as you start walking, messages will be sent to the phone and up to Service Bus when pedometer values change. Fetch sends a message on command. The web app consoles all the messages being sent. Disconnect ends the connection.
+9.	From the main menu of the Gear, swipe twice to the right to Apps, and then click Activize. You must hit Connect for the connection between the device and the host to be established. As soon as you start walking, messages will be sent to the phone and up to Service Bus Event Hubs when pedometer values change. Fetch sends a message on command. The wearable app console logs all the messages being sent. Disconnect ends the connection.
+
 
 For more detailed notes on the host-side Android app:
 
